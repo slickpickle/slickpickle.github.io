@@ -7,12 +7,120 @@
     integrity="sha256-kLaT2GOSpHechhsozzB+flnD+zUyjE2LlfWPgU04xyI="
     crossorigin=""/>
     <style>
-        #map { 
-          height: 550px; 
-          width: 70%;
+        @media (max-width: 767px) {
+          #outer {
+            width:100%;
+            float: left;
+          }
+          #map {
+            width: 100vw;
+            height: 70vh;
+            float: left;
+            border-radius: 12px;
+          }
+            .desktop{
+            display:none;
+          }
+          .slidecontainer {
+          width: 100%;
+          margin-top: 10px;
           float: left;
-          border-radius: 12px;
+          }
+          .slider {
+            -webkit-appearance: none;
+            width: 90%;
+            margin-left: 5%;
+            height: 15px;
+            background: #EF4765;
+            outline: none;
+            border: 5px solid #FF9A5A;
+            border-radius: 8px;
+            opacity: 0.9;
+            -webkit-transition: .2s;
+            transition: opacity .2s;
+          }
+          .slider:hover {
+            opacity: 1;
+          }
+
+          .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 40px;
+            background: #EF4765;
+            cursor: pointer;
+            border: 5px solid #FF9A5A;
+            border-radius: 4px;
+          }
+          select {
+            width: 90%;
+            margin-left: 5%;
+            padding: 16px 20px;
+            border: none;
+            border-radius: 4px;
+            background-color: #f1f1f1;
+            margin-top:10px;
+          }
         }
+        @media (min-width: 767px) {
+          #outer {
+            width:30%;
+            float: left;
+            text-align: center;
+            height: 400px;
+          }
+          #map {
+            width: 70%;
+            height: 100vh;
+            float: left;
+            border-radius: 12px;
+          }
+          .slidecontainer {
+            width: 100%;
+            margin-top: 10px;
+            float: left;
+          }
+          .slider {
+            -webkit-appearance: none;
+            width: 90%;
+            height: 15px;
+            background: #EF4765;
+            outline: none;
+            border: 5px solid #FF9A5A;
+            border-radius: 8px;
+            opacity: 0.9;
+            -webkit-transition: .2s;
+            transition: opacity .2s;
+          }
+          .slider:hover {
+            opacity: 1;
+          }
+
+          .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 40px;
+            background: #EF4765;
+            cursor: pointer;
+            border: 5px solid #FF9A5A;
+            border-radius: 4px;
+          }
+          select {
+            width: 90%;
+            padding: 16px 20px;
+            border: none;
+            border-radius: 4px;
+            background-color: #f1f1f1;
+            margin-top:10px;
+          }
+        }
+        body{
+          padding: 0;
+          margin: 0;
+        }
+
         .title{
           font-size: 24px;
         }
@@ -45,13 +153,13 @@
         .birds:not([disabled]):hover {
           box-shadow: 0 0 .25rem rgba(0, 0, 0, 0.5), -.125rem -.125rem 1rem rgba(239, 71, 101, 0.5), .125rem .125rem 1rem rgba(255, 154, 90, 0.5);
         }
-        #outer {
+/*         #outer {
             width:30%;
             float: left;
             text-align: center;
             height: 400px;
-        }
-        .slidecontainer {
+        } */
+/*         .slidecontainer {
           width: 100%;
           margin-top: 10px;
           float: left;
@@ -89,7 +197,7 @@
           border-radius: 4px;
           background-color: #f1f1f1;
           margin-top:10px;
-        }
+        } */
         #date {
           font-family: -apple-system,system-ui,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
           font-size: 12px;
@@ -110,28 +218,43 @@
 
   </head>
   <body>
-    <div id="map"></div>
-    <div id="outer">
-      <h3>Select a Bird</h3>
-      <button class="birds" id="turvul" value="turvul" onclick="mapData(this.value)">Turkey Vulture - </button>
-      <button class="birds" id="osprey" value="osprey" onclick="mapData(this.value)">Osprey - </button>
-      <button class="birds" id="wlswar" value="wlswar" onclick="mapData(this.value)">Wilson's Warbler - </button>
-      <button class="birds" id="yehbla" value="yehbla" onclick="mapData(this.value)">Yellow-headed Blackbird - </button>
-      <button class="birds" id="comnig" value="comnig" onclick="mapData(this.value)">Common Nighthawk - </button>
-      <button class="birds" id="cliswa" value="cliswa" onclick="mapData(this.value)">Cliff Swallow - </button>
-      <button class="birds" id="cintea" value="cintea" onclick="mapData(this.value)">Cinnamon Teal - </button>
-      <button class="birds" id="whtspa" value="whtspa" onclick="mapData(this.value)">WT Sparrow - </button>
-      <form>
-        <select id="notableList" name="notableList" onChange="mapData2(this.value)">
-          <option value="" disabled selected>Notable birds...</option>
-        </select>
-      </form>      
-      <div class="slidecontainer">
-        <input type="range" min="1" max="100" value="50" class="slider" id="dateRange">
+<!--     <div class="mobile">
+      <div id="map"></div>
+      <div id="outer mob">
+        <form>
+          <select id="notableList" name="notableList" onChange="mapData2(this.value)">
+            <option value="" disabled selected>Notable birds...</option>
+          </select>
+        </form>      
+        <div class="slidecontainer">
+          <input type="range" min="1" max="100" value="50" class="slider" id="dateRange">
+        </div>
+        <div><span id="date"></span></div>
       </div>
-      <div><span id="date"></span></div>
-    </div>
-    
+    </div> -->
+      <div id="map"></div>
+      <div id="outer">
+        <div class="desktop">
+          <h3>Select a Bird</h3>
+          <button class="birds" id="turvul" value="turvul" onclick="mapData(this.value)">Turkey Vulture - </button>
+          <button class="birds" id="osprey" value="osprey" onclick="mapData(this.value)">Osprey - </button>
+          <button class="birds" id="wlswar" value="wlswar" onclick="mapData(this.value)">Wilson's Warbler - </button>
+          <button class="birds" id="yehbla" value="yehbla" onclick="mapData(this.value)">Yellow-headed Blackbird - </button>
+          <button class="birds" id="comnig" value="comnig" onclick="mapData(this.value)">Common Nighthawk - </button>
+          <button class="birds" id="cliswa" value="cliswa" onclick="mapData(this.value)">Cliff Swallow - </button>
+          <button class="birds" id="cintea" value="cintea" onclick="mapData(this.value)">Cinnamon Teal - </button>
+          <button class="birds" id="whtspa" value="whtspa" onclick="mapData(this.value)">WT Sparrow - </button>
+        </div>
+        <form>
+          <select id="notableList" name="notableList" onChange="mapData2(this.value)">
+            <option value="" disabled selected>Notable birds...</option>
+          </select>
+        </form>      
+        <div class="slidecontainer">
+          <input type="range" min="1" max="100" value="50" class="slider" id="dateRange">
+        </div>
+        <div><span id="date"></span></div>
+      </div>
     <script>
       const apiKey = "g0gbj09j2s1b"; // replace with your own eBird API key
       var map = L.map('map').setView([40.8, -119.5], 4);
