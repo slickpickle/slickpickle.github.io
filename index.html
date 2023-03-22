@@ -14,7 +14,7 @@
           }
           #map {
             width: 100vw;
-            height: 70vh;
+            height: 60vh;
             float: left;
             border-radius: 12px;
           }
@@ -61,6 +61,14 @@
             border-radius: 4px;
             background-color: #f1f1f1;
             margin-top:10px;
+          }
+          #mobileTitle {
+            font-family: -apple-system,system-ui,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+            font-size: 16px;
+            font-weight: 500;
+            margin-top: 10px;
+            margin-bottom: 10px;
+            text-align: center;
           }
         }
         @media (min-width: 767px) {
@@ -115,6 +123,9 @@
             background-color: #f1f1f1;
             margin-top:10px;
           }
+          .mobile{
+            display:none;
+          }
         }
         body{
           padding: 0;
@@ -153,51 +164,6 @@
         .birds:not([disabled]):hover {
           box-shadow: 0 0 .25rem rgba(0, 0, 0, 0.5), -.125rem -.125rem 1rem rgba(239, 71, 101, 0.5), .125rem .125rem 1rem rgba(255, 154, 90, 0.5);
         }
-/*         #outer {
-            width:30%;
-            float: left;
-            text-align: center;
-            height: 400px;
-        } */
-/*         .slidecontainer {
-          width: 100%;
-          margin-top: 10px;
-          float: left;
-        }
-        .slider {
-          -webkit-appearance: none;
-          width: 90%;
-          height: 15px;
-          background: #EF4765;
-          outline: none;
-          border: 5px solid #FF9A5A;
-          border-radius: 8px;
-          opacity: 0.9;
-          -webkit-transition: .2s;
-          transition: opacity .2s;
-        }
-        .slider:hover {
-          opacity: 1;
-        }
-
-        .slider::-webkit-slider-thumb {
-          -webkit-appearance: none;
-          appearance: none;
-          width: 20px;
-          height: 40px;
-          background: #EF4765;
-          cursor: pointer;
-          border: 5px solid #FF9A5A;
-          border-radius: 4px;
-        }
-        select {
-          width: 90%;
-          padding: 16px 20px;
-          border: none;
-          border-radius: 4px;
-          background-color: #f1f1f1;
-          margin-top:10px;
-        } */
         #date {
           font-family: -apple-system,system-ui,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
           font-size: 12px;
@@ -218,20 +184,7 @@
 
   </head>
   <body>
-<!--     <div class="mobile">
-      <div id="map"></div>
-      <div id="outer mob">
-        <form>
-          <select id="notableList" name="notableList" onChange="mapData2(this.value)">
-            <option value="" disabled selected>Notable birds...</option>
-          </select>
-        </form>      
-        <div class="slidecontainer">
-          <input type="range" min="1" max="100" value="50" class="slider" id="dateRange">
-        </div>
-        <div><span id="date"></span></div>
-      </div>
-    </div> -->
+      <div class="mobile" id="mobileTitle">Bird Migration</div>
       <div id="map"></div>
       <div id="outer">
         <div class="desktop">
@@ -253,7 +206,7 @@
         <div class="slidecontainer">
           <input type="range" min="1" max="100" value="50" class="slider" id="dateRange">
         </div>
-        <div><span id="date"></span></div>
+        <div id="date"></div>
       </div>
     <script>
       const apiKey = "g0gbj09j2s1b"; // replace with your own eBird API key
@@ -497,8 +450,6 @@
         //initially load all data into the map
         var birdDate = document.getElementById("date");
         birdDate.textContent = `Last 30 Days`;
-        //minDate = birdData[0].obsDt;
-        //maxDate = birdData[0].obsDt;
 
         birdData.forEach(observation => {
           L.circle([observation.lat, observation.lng], {
