@@ -1,181 +1,104 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Migration Observations in the US</title>
+    <title>Bird Migrations</title>
     <meta content="width=device-width, initial-scale=1" name="viewport" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css"
     integrity="sha256-kLaT2GOSpHechhsozzB+flnD+zUyjE2LlfWPgU04xyI="
     crossorigin=""/>
     <style>
-        @media (max-width: 767px) {
-          #outer {
-            width:100%;
-            float: left;
-          }
-          #map {
-            width: 100vw;
-            height: 65vh;
-            float: left;
-            border-radius: 12px;
-          }
-            .desktop{
-            display:none;
-          }
-          .slidecontainer {
-          width: 100%;
-          margin-top: 10px;
-          float: left;
-          }
-          .slider {
-            -webkit-appearance: none;
-            width: 90%;
-            margin-left: 5%;
-            height: 15px;
-            background: #EF4765;
-            outline: none;
-            border: 5px solid #FF9A5A;
-            border-radius: 8px;
-            opacity: 0.9;
-            -webkit-transition: .2s;
-            transition: opacity .2s;
-          }
-          .slider:hover {
-            opacity: 1;
-          }
-
-          .slider::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            appearance: none;
-            width: 20px;
-            height: 40px;
-            background: #EF4765;
-            cursor: pointer;
-            border: 5px solid #FF9A5A;
-            border-radius: 4px;
-          }
-          select {
-            width: 90%;
-            margin-left: 5%;
-            padding: 16px 20px;
-            border: none;
-            border-radius: 4px;
-            background-color: #f1f1f1;
-            margin-top:10px;
-          }
-          #mobileTitle {
-            font-family: -apple-system,system-ui,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-            font-size: 16px;
-            font-weight: 500;
-            margin-top: 10px;
-            margin-bottom: 10px;
+        body{
+                padding: 0;
+                margin: 0;
+        }
+        .title {
             text-align: center;
-          }
+            text-align: center;
+            font-family: -apple-system,system-ui,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+            font-size: 24px;
+            font-weight: 500;
+            margin: 10px;
         }
         @media (min-width: 767px) {
-          #outer {
-            width:30%;
-            float: left;
-            text-align: center;
-            height: 400px;
-          }
-          #map {
-            width: 70%;
-            height: 100vh;
-            float: left;
-            border-radius: 12px;
-          }
-          .slidecontainer {
-            width: 100%;
-            margin-top: 10px;
-            float: left;
-          }
-          .slider {
-            -webkit-appearance: none;
-            width: 90%;
-            height: 15px;
-            background: #EF4765;
-            outline: none;
-            border: 5px solid #FF9A5A;
-            border-radius: 8px;
-            opacity: 0.9;
-            -webkit-transition: .2s;
-            transition: opacity .2s;
-          }
-          .slider:hover {
-            opacity: 1;
-          }
-
-          .slider::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            appearance: none;
-            width: 20px;
-            height: 40px;
-            background: #EF4765;
-            cursor: pointer;
-            border: 5px solid #FF9A5A;
-            border-radius: 4px;
-          }
-          select {
-            width: 90%;
-            padding: 16px 20px;
-            border: none;
-            border-radius: 4px;
-            background-color: #f1f1f1;
-            margin-top:10px;
-          }
-          .mobile{
-            display:none;
-          }
+            .mobile {
+                display: none;
+            }
+            #map {
+                width: 70%;
+                height: 100vh;
+                float: left;
+                border-radius: 12px;
+            }
+            #selectors {
+                width: 30%;
+                height: 100vh;
+                float: left;
+            }
+            select {
+                width: 90%;
+                margin-left: 5%;
+                padding: 16px 20px;
+                border: none;
+                border-radius: 4px;
+                background-color: #f1f1f1;
+                margin-top:10px;
+            }
+            input {
+                width: 80%;
+                margin-left: 5%;
+                padding: 16px 20px;
+                border: none;
+                border-radius: 4px;
+                background-color: #f1f1f1;
+                margin-top:10px;
+            }
+            #dateContainer{
+                text-align: center;
+                font-family: -apple-system,system-ui,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+                font-size: 12px;
+                font-weight: 500;
+            }
         }
-        body{
-          padding: 0;
-          margin: 0;
+        @media (max-width: 766px) {
+            .desktop {
+                display: none;
+            }
+            #map {
+                width: 100vw;
+                height: 70vh;
+                float: left;
+                border-radius: 12px;
+            }
+            #selectors {
+                width: 100vw;
+                height: 30vh;
+                float: left;
+            }
+            select {
+                width: 90%;
+                margin-left: 5%;
+                padding: 16px 20px;
+                border: none;
+                border-radius: 4px;
+                background-color: #f1f1f1;
+                margin-top:10px;
+            }
+            input {
+                width: 80%;
+                margin-left: 5%;
+                padding: 16px 20px;
+                border: none;
+                border-radius: 4px;
+                background-color: #f1f1f1;
+                margin-top:10px;
+            }
+            #dateContainer{
+                text-align: center;
+                font-family: -apple-system,system-ui,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+                font-size: 12px;
+                font-weight: 500;
+            }
         }
-
-        .title{
-          font-size: 24px;
-        }
-        .birds {
-          background: linear-gradient(to bottom right, #EF4765, #FF9A5A);
-          border: 0;
-          border-radius: 12px;
-          color: #FFFFFF;
-          cursor: pointer;
-          display: inline-block;
-          font-family: -apple-system,system-ui,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-          font-size: 12px;
-          font-weight: 500;
-          line-height: 2.5;
-          outline: transparent;
-          padding: 0 1rem;
-          text-align: center;
-          text-decoration: none;
-          transition: box-shadow .2s ease-in-out;
-          user-select: none;
-          -webkit-user-select: none;
-          touch-action: manipulation;
-          white-space: nowrap;
-          margin-top: 5px;
-        }
-        .birds:not([disabled]):focus {
-          box-shadow: 0 0 .25rem rgba(0, 0, 0, 0.5), -.125rem -.125rem 1rem rgba(239, 71, 101, 0.5), .125rem .125rem 1rem rgba(255, 154, 90, 0.5);
-        }
-
-        .birds:not([disabled]):hover {
-          box-shadow: 0 0 .25rem rgba(0, 0, 0, 0.5), -.125rem -.125rem 1rem rgba(239, 71, 101, 0.5), .125rem .125rem 1rem rgba(255, 154, 90, 0.5);
-        }
-        #date {
-          font-family: -apple-system,system-ui,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-          font-size: 12px;
-          font-weight: 500;
-        }
-        h3{
-          font-family: -apple-system,system-ui,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-          font-size: 24px;
-          font-weight: 500;
-        }
-
-        
 
     </style>    
     <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"
@@ -184,380 +107,283 @@
 
   </head>
   <body>
-      <div class="mobile" id="mobileTitle">Bird Migration</div>
-      <div id="map"></div>
-      <div id="outer">
-        <div class="desktop">
-          <h3>Select a Bird</h3>
-          <button class="birds" id="turvul" value="turvul" onclick="mapData(this.value)">Turkey Vulture - </button>
-          <button class="birds" id="osprey" value="osprey" onclick="mapData(this.value)">Osprey - </button>
-          <button class="birds" id="wlswar" value="wlswar" onclick="mapData(this.value)">Wilson's Warbler - </button>
-          <button class="birds" id="yehbla" value="yehbla" onclick="mapData(this.value)">Yellow-headed Blackbird - </button>
-          <button class="birds" id="comnig" value="comnig" onclick="mapData(this.value)">Common Nighthawk - </button>
-          <button class="birds" id="cliswa" value="cliswa" onclick="mapData(this.value)">Cliff Swallow - </button>
-          <button class="birds" id="cintea" value="cintea" onclick="mapData(this.value)">Cinnamon Teal - </button>
-          <button class="birds" id="whtspa" value="whtspa" onclick="mapData(this.value)">WT Sparrow - </button>
-        </div>
+    <div class="title mobile">Migration Tracker</div>
+    <h3 class="mobile"></h3>
+    <div id="map"></div>
+    <div class="title desktop">Migration Tracker</div>
+    <div id = "selectors">
         <form>
-          <select id="notableList" name="notableList" onChange="mapData2(this.value)">
+            <select id="notableList" name="notableList" onChange="mapBirds(this.value)">
             <option value="" disabled selected>Notable birds...</option>
-          </select>
-        </form>      
-        <div class="slidecontainer">
-          <input type="range" min="1" max="100" value="50" class="slider" id="dateRange">
+            </select>
+        </form>
+        <div class="container">
+            <div class="text-container">
+                <input type="text" list="oregonList" placeholder="Birds in Oregon..." onChange="mapBirds(this.value)" />
+                <datalist id="oregonList"></datalist>
+            </div>
         </div>
-        <div id="date"></div>
-      </div>
-    <script>
-      const apiKey = "g0gbj09j2s1b"; // replace with your own eBird API key
-      var map = L.map('map').setView([40.8, -119.5], 4);
-      L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/toner-lite/{z}/{x}/{y}{r}.{ext}', {
-	attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-	subdomains: 'abcd',
-	minZoom: 0,
-	maxZoom: 20,
-	ext: 'png'
-}).addTo(map);
-          
-      var endpointturvul = "https://api.ebird.org/v2/data/obs/US-OR/recent/turvul?back=30&r=US-ID,US-CA,US-NV,US-WA,US-OR"; // endpoint for the observation list API
-      var endpointosprey = "https://api.ebird.org/v2/data/obs/US-OR/recent/osprey?back=30&r=US-ID,US-CA,US-NV,US-WA,US-OR"; // endpoint for the observation list API
-      var endpointwlswar = "https://api.ebird.org/v2/data/obs/US-OR/recent/wlswar?back=30&r=US-ID,US-CA,US-NV,US-WA,US-OR"; // endpoint for the observation list API
-      var endpointcomnig = "https://api.ebird.org/v2/data/obs/US-OR/recent/comnig?back=30&r=US-ID,US-CA,US-NV,US-WA,US-OR"; // endpoint for the observation list API
-      var endpointyehbla = "https://api.ebird.org/v2/data/obs/US-OR/recent/yehbla?back=30&r=US-ID,US-CA,US-NV,US-WA,US-OR"; // endpoint for the observation list API
-      var endpointcliswa = "https://api.ebird.org/v2/data/obs/US-OR/recent/cliswa?back=30&r=US-ID,US-CA,US-NV,US-WA,US-OR"; // endpoint for the observation list API
-      var endpointcintea = "https://api.ebird.org/v2/data/obs/US-OR/recent/cintea?back=30&r=US-ID,US-CA,US-NV,US-WA,US-OR"; // endpoint for the observation list API
-      var endpointwhtspa = "https://api.ebird.org/v2/data/obs/US-OR/recent/whtspa?back=30&r=US-ID,US-CA,US-NV,US-WA,US-OR"; // endpoint for the observation list API
-      var enpointNotable = "https://api.ebird.org/v2/data/obs/US-OR/recent/notable?detail=simple"
-      
-      var dataList = document.getElementById('notableList');
-      var notableData = []
-      var uniqueNotable = []
-      fetch(enpointNotable, {
-        headers: {
-          "X-eBirdApiToken": apiKey,
-        },
-      })
-      .then(response => response.json())
-      .then(data => {
-        data.forEach(observation => {
-          var notableObj = {
-            "comName": observation.comName,
-            "speciesCode": observation.speciesCode
-          }
-          notableData.push(notableObj)
-        });
-        var uniqueNotable = [...new Set(notableData.map(item => item.comName))];
-        var dataList = document.getElementById('notableList'); 
-        uniqueNotable.sort(); 
-
-        for(var i = 0; i < uniqueNotable.length; i++) {
-          var opt = uniqueNotable[i];
-          var el = document.createElement("option");
-          el.text = opt;
-          el.value = opt;
-          dataList.appendChild(el);
-        }
-      })
-      
-      var ospreyData
-      fetch(endpointosprey, {
-        headers: {
-          "X-eBirdApiToken": apiKey,
-        },
-      })
-      .then(response => response.json())
-      .then(data => {
-        data.forEach(observation => {
-          var currDateParts = observation.obsDt.substring(0,10).split('-')
-          var currDate = Number(currDateParts[0]+currDateParts[1]+currDateParts[2])
-          observation.obsDt = currDate
-        });
-        var btn = document.getElementById("osprey");
-        btn.textContent += `${data.length}`;
-        ospreyData = data;
-      })
-
-      var turvulData
-      fetch(endpointturvul, {
-        headers: {
-          "X-eBirdApiToken": apiKey,
-        },
-      })
-      .then(response => response.json())
-      .then(data => {
-        data.forEach(observation => {
-          var currDateParts = observation.obsDt.substring(0,10).split('-')
-          var currDate = Number(currDateParts[0]+currDateParts[1]+currDateParts[2])
-          observation.obsDt = currDate
-        });
-
-        var btn = document.getElementById("turvul");
-        btn.textContent += `${data.length}`;
-        turvulData = data;
-      })
+        <div class="slidecontainer">
+            <input type="range" min="1" max="100" value="50" class="slider" id="dateRange">
+        </div>
+        <div id="dateContainer"><div id="date"></div></div>
+    </div>
     
-      var  wlswarData
-      fetch(endpointwlswar, {
-        headers: {
-          "X-eBirdApiToken": apiKey,
-        },
-      })
-      .then(response => response.json())
-      .then(data => {
-        data.forEach(observation => {
-          var currDateParts = observation.obsDt.substring(0,10).split('-')
-          var currDate = Number(currDateParts[0]+currDateParts[1]+currDateParts[2])
-          observation.obsDt = currDate
-        });
+    <script>
+      
+        var map = L.map('map').setView([40.8, -119.5], 4);
+        L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/toner-lite/{z}/{x}/{y}{r}.{ext}', {
+            attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+            subdomains: 'abcd',
+            minZoom: 0,
+            maxZoom: 20,
+            ext: 'png'
+        }).addTo(map);
 
-        var btn = document.getElementById("wlswar");
-        btn.textContent += `${data.length}`;
-        wlswarData = data
-      })
-
-      var comnigData 
-      fetch(endpointcomnig, {
-        headers: {
-          "X-eBirdApiToken": apiKey,
-        },
-      })
-      .then(response => response.json())
-      .then(data => {
-        data.forEach(observation => {
-          var currDateParts = observation.obsDt.substring(0,10).split('-')
-          var currDate = Number(currDateParts[0]+currDateParts[1]+currDateParts[2])
-          observation.obsDt = currDate
-        });
-
-        var btn = document.getElementById("comnig");
-        btn.textContent += `${data.length}`;
-        comnigData = data
-      })
-
-      var yehblaData 
-      fetch(endpointyehbla, {
-        headers: {
-          "X-eBirdApiToken": apiKey,
-        },
-      })
-      .then(response => response.json())
-      .then(data => {
-        data.forEach(observation => {
-          var currDateParts = observation.obsDt.substring(0,10).split('-')
-          var currDate = Number(currDateParts[0]+currDateParts[1]+currDateParts[2])
-          observation.obsDt = currDate
-        });
-
-        var btn = document.getElementById("yehbla");
-        btn.textContent += `${data.length}`;
-        yehblaData = data
-      })
-
-      var cliswaData
-      fetch(endpointcliswa, {
-        headers: {
-          "X-eBirdApiToken": apiKey,
-        },
-      })
-      .then(response => response.json())
-      .then(data => {
-        data.forEach(observation => {
-          var currDateParts = observation.obsDt.substring(0,10).split('-')
-          var currDate = Number(currDateParts[0]+currDateParts[1]+currDateParts[2])
-          observation.obsDt = currDate
-        });
-
-        var btn = document.getElementById("cliswa");
-        btn.textContent += `${data.length}`;
-        cliswaData = data
-      })
-
-      var cinteaData
-      fetch(endpointcintea, {
-        headers: {
-          "X-eBirdApiToken": apiKey,
-        },
-      })
-      .then(response => response.json())
-      .then(data => {
-        data.forEach(observation => {
-          var currDateParts = observation.obsDt.substring(0,10).split('-')
-          var currDate = Number(currDateParts[0]+currDateParts[1]+currDateParts[2])
-          observation.obsDt = currDate
-        });
-
-        var btn = document.getElementById("whtspa");
-        btn.textContent += `${data.length}`;
-        cinteaData = data
-      })
-
-      var whtspaData
-      fetch(endpointwhtspa, {
-        headers: {
-          "X-eBirdApiToken": apiKey,
-        },
-      })
-      .then(response => response.json())
-      .then(data => {
-        data.forEach(observation => {
-          var currDateParts = observation.obsDt.substring(0,10).split('-')
-          var currDate = Number(currDateParts[0]+currDateParts[1]+currDateParts[2])
-          observation.obsDt = currDate
-        });
-
-        var btn = document.getElementById("cintea");
-        btn.textContent += `${data.length}`;
-        whtspaData = data
-      })
-
-      var notableBirdData
-      var i = 0
-      var birdData
-      var dateObs = []
-      var dateSet
-      var dateArr = []
-      var layersArr = []
-      var birdByDay
-      var layer = L.layerGroup()
-      var minDate
-      var maxDate
-      var datesObjArr = []
-
-      function mapData(birdType) {
-        var fg = L.featureGroup();
-        i=-1
-        layer.clearLayers()
-        layersArr = []
-        if(birdType == 'wlswar'){
-          birdData = wlswarData
-        } else if(birdType == 'osprey') {
-          birdData = ospreyData
-        } else if(birdType == 'turvul') {
-          birdData = turvulData
-        } else if(birdType == 'comnig') {
-          birdData = comnigData
-        } else if(birdType == 'yehbla') { 
-          birdData = yehblaData
-        } else if(birdType == 'cliswa') {
-          birdData = cliswaData
-        } else if(birdType == 'cintea') {
-          birdData = cinteaData
-        } else if(birdType == 'whtspa') {
-          birdData = whtspaData
-        } else {
-          birdData = notableBirdData
-        }
-        //initially load all data into the map
+        const apiKey = "g0gbj09j2s1b"; // replace with your own eBird API key      
+        var enpointOregonRecent = "https://api.ebird.org/v2/data/obs/US-OR/recent"
+        var enpointNotable = "https://api.ebird.org/v2/data/obs/US-OR/recent/notable?detail=simple"
+        
+        var notableData = []
+        var uniqueNotable = []
+        var oregonRecentData = []
+        var uniqueOregon = []
+        var fullList = []
+        var birdData
+        var layer = L.layerGroup()
+        var dateObs = []
         var birdDate = document.getElementById("date");
-        birdDate.textContent = `Last 30 Days`;
 
-        birdData.forEach(observation => {
-          L.circle([observation.lat, observation.lng], {
-            color: 'red',
-            opacity: 0.1,
-            fillColor: '#f03',
-            fillOpacity: 0.3,
-            radius: 5000
-          }).addTo(layer);
-          L.marker([observation.lat, observation.lng]).addTo(fg)
-        })
-        layer.addTo(map)
-        map.fitBounds(fg.getBounds());
-          
-        //Creates list of unique dates and pushes into a sorted array
-        datesObjArr = []
-        dateArr = []
-
-        birdData.forEach(observation => {
-          dateObs.push(observation.obsDt)
-        });
-        dateSet = new Set(dateObs)
-        dateSet.forEach(date =>{
-          dateArr.push(date)
-        })
-        dateArr.sort()
-        //For each date it captures the bird data in the data object, then pushes those into a layer group
-
-        var d =0
-        dateArr.forEach(date => {
-          d=d+1
-          var dateObj = {
-            "id": d,
-            "dateInt": date,
-            "dateTxt": date.toString().slice(4,6)+"/"+date.toString().slice(6,8)+"/"+date.toString().slice(0,4)
-          }
-          datesObjArr.push(dateObj)
-
-          // birdByDay = birdData.filter(function (el) {
-          //   return el.obsDt === date
-          // });            
-        })
-        document.getElementById("dateRange").max = datesObjArr.length;
-        document.getElementById("dateRange").min = 0;
-        document.getElementById("dateRange").value = datesObjArr.length;
-      }
-
-      var slider = document.getElementById("dateRange");
-      slider.oninput = function() {
-        layer.clearLayers()
-        var tempDateInt
-        var tempDateTxt
-        //var fg = L.featureGroup();
-        datesObjArr.forEach(date => {
-          if (slider.value == date.id){
-            tempDateInt = date.dateInt
-            tempDateTxt = date.dateTxt
-          }
-        })
-        var bbd = birdData.filter(function (el){
-          return el.obsDt <= tempDateInt
-        })
-        if(bbd.length > 0) {
-          var birdDate = document.getElementById("date");
-          birdDate.textContent = tempDateTxt;
-          bbd.forEach(observation => {
-            L.circle([observation.lat, observation.lng], {
-              color: 'red',
-              opacity: 0.1,
-              fillColor: '#f03',
-              fillOpacity: 0.3,
-              radius: 5000
-            }).addTo(layer);
-            //L.marker([observation.lat, observation.lng]).addTo(fg)
-          })
-          layer.addTo(map)
-          //map.fitBounds(fg.getBounds());
-        } 
-      }
-
-      function mapData2(birdType) {
-        var specCode
-        notableData.forEach(type => {
-          if (birdType == type.comName) {
-            specCode = type.speciesCode
-          }
-        })
-        fetch(`https://api.ebird.org/v2/data/obs/US-OR/recent/${specCode}?back=30&r=US-ID,US-CA,US-NV,US-WA,US-OR`, {
+        fetch(enpointOregonRecent, {
         headers: {
-          "X-eBirdApiToken": apiKey,
-        },
+            "X-eBirdApiToken": apiKey,
+            },
         })
         .then(response => response.json())
         .then(data => {
-          data.forEach(observation => {
-            var currDateParts = observation.obsDt.substring(0,10).split('-')
-            var currDate = Number(currDateParts[0]+currDateParts[1]+currDateParts[2])
-            observation.obsDt = currDate
-          });
-          notableBirdData = data
-          mapData()
+            data.forEach(observation => {
+                var OrRecObj = {
+                "comName": observation.comName,
+                "speciesCode": observation.speciesCode
+            }
+            oregonRecentData.push(OrRecObj)
+            fullList.push(OrRecObj) 
+            });
+            var uniqueOregon = [...new Set(oregonRecentData.map(item => item.comName))];
+            uniqueOregon.sort();             
+
+            var dataList = document.getElementById('oregonList'); 
+            for(var i = 0; i < uniqueOregon.length; i++) {
+            var opt = uniqueOregon[i];
+            var el = document.createElement("option");
+            el.text = opt;
+            el.value = opt;
+            dataList.appendChild(el);
+            }
         })
-      }
-      
+            
 
-    
+        fetch(enpointNotable, {
+            headers: {
+            "X-eBirdApiToken": apiKey,
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            data.forEach(observation => {
+            var notableObj = {
+                "comName": observation.comName,
+                "speciesCode": observation.speciesCode
+            }
+            notableData.push(notableObj)
+            fullList.push(notableObj) 
+            });
+            var uniqueNotable = [...new Set(notableData.map(item => item.comName))];
+            uniqueNotable.sort();             
+
+            var dataList = document.getElementById('notableList'); 
+            for(var i = 0; i < uniqueNotable.length; i++) {
+            var opt = uniqueNotable[i];
+            var el = document.createElement("option");
+            el.text = opt;
+            el.value = opt;
+            dataList.appendChild(el);
+            }
+        })
+
+
+
+        function mapBirds(comName) {
+            birdDate.textContent = "Last 30 Days";
+            var fg = L.featureGroup();
+            var specCode
+            fullList.forEach(type => {
+            if (comName == type.comName) {
+                specCode = type.speciesCode
+            }
+            })
+            fetch(`https://api.ebird.org/v2/data/obs/US-OR/recent/${specCode}?back=30&r=US-ID,US-CA,US-NV,US-WA,US-OR`, {
+            headers: {
+            "X-eBirdApiToken": apiKey,
+            },
+            })
+            .then(response => response.json())
+            .then(data => {
+                birdData = data
+                layer.clearLayers()
+                data.forEach(observation => {
+                    var currDateParts = observation.obsDt.substring(0,10).split('-')
+                    var currDate = Number(currDateParts[0]+currDateParts[1]+currDateParts[2])
+                    observation.obsDt = currDate
+                });
+                
+                if (data.length > 1) {                
+                    data.forEach(observation => {
+                    L.circle([observation.lat, observation.lng], {
+                        color: 'red',
+                        opacity: 0.1,
+                        fillColor: '#f03',
+                        fillOpacity: 0.3,
+                        radius: 10000
+                    }).addTo(layer);
+                    L.marker([observation.lat, observation.lng]).addTo(fg)
+                    })
+                    layer.addTo(map)
+                    map.fitBounds(fg.getBounds());
+
+                    datesObjArr = []
+                    dateArr = []
+
+                    data.forEach(observation => {
+                    dateObs.push(observation.obsDt)
+                    });
+                    dateSet = new Set(dateObs)
+                    dateSet.forEach(date =>{
+                    dateArr.push(date)
+                    })
+                    dateArr.sort()
+                    //For each date it captures the bird data in the data object, then pushes those into a layer group
+
+                    var d =0
+                    dateArr.forEach(date => {
+                    d=d+1
+                    var dateObj = {
+                        "id": d,
+                        "dateInt": date,
+                        "dateTxt": date.toString().slice(4,6)+"/"+date.toString().slice(6,8)+"/"+date.toString().slice(0,4)
+                    }
+                    datesObjArr.push(dateObj)
+
+                    // birdByDay = birdData.filter(function (el) {
+                    //   return el.obsDt === date
+                    // });            
+                    })
+                    document.getElementById("dateRange").max = datesObjArr.length;
+                    document.getElementById("dateRange").min = 1;
+                    document.getElementById("dateRange").value = 30;
+                    
+
+                } else {
+                    farAwayMap(specCode)
+                }
+
+            })
+
+        }
+
+        function farAwayMap(speciesCode) {
+            var fg = L.featureGroup();
+            fetch(`https://api.ebird.org/v2/data/nearest/geo/recent/${speciesCode}?lat=44.3&lng=-121.2&back=30`, {
+            headers: {
+                "X-eBirdApiToken": apiKey,
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                birdData = data
+                if (data.length > 0) {
+                    data.forEach(observation => {
+                    var currDateParts = observation.obsDt.substring(0,10).split('-')
+                    var currDate = Number(currDateParts[0]+currDateParts[1]+currDateParts[2])
+                    observation.obsDt = currDate
+                    L.circle([observation.lat, observation.lng], {
+                        color: 'blue',
+                        fillColor: 'blue',
+                        fillOpacity: 0.7,
+                        radius: 50000
+                    }).addTo(layer);
+                    L.marker([observation.lat, observation.lng]).addTo(fg)
+                    })
+                    layer.addTo(map)
+                    map.fitBounds(fg.getBounds());
+
+                    datesObjArr = []
+                    dateArr = []
+
+                    data.forEach(observation => {
+                    dateObs.push(observation.obsDt)
+                    });
+                    dateSet = new Set(dateObs)
+                    dateSet.forEach(date =>{
+                    dateArr.push(date)
+                    })
+                    dateArr.sort()
+                    //For each date it captures the bird data in the data object, then pushes those into a layer group
+
+                    var d =0
+                    dateArr.forEach(date => {
+                    d=d+1
+                    var dateObj = {
+                        "id": d,
+                        "dateInt": date,
+                        "dateTxt": date.toString().slice(4,6)+"/"+date.toString().slice(6,8)+"/"+date.toString().slice(0,4)
+                    }
+                    datesObjArr.push(dateObj)
+
+                    // birdByDay = birdData.filter(function (el) {
+                    //   return el.obsDt === date
+                    // });            
+                    })
+                    document.getElementById("dateRange").max = datesObjArr.length;
+                    document.getElementById("dateRange").min = 1;
+                    document.getElementById("dateRange").value = 30;
+                    birdDate.textContent = "Not many on West Coast. Closest in last 30 Days";
+                } else {
+                    birdDate.textContent = "No birds reported in last 30 days";
+                }
+                
+            })
+        }
+
+
+        var slider = document.getElementById("dateRange");
+        slider.oninput = function() {
+            layer.clearLayers()
+            var tempDateInt
+            var tempDateTxt
+            datesObjArr.forEach(date => {
+            if (slider.value == date.id){
+                tempDateInt = date.dateInt
+                tempDateTxt = date.dateTxt
+            }
+            })
+            var bbd = birdData.filter(function (el){
+            return el.obsDt <= tempDateInt
+            })
+            if(bbd.length > 0) {
+                birdDate.textContent = tempDateTxt;
+                bbd.forEach(observation => {
+                    L.circle([observation.lat, observation.lng], {
+                    color: 'red',
+                    opacity: 0.1,
+                    fillColor: '#f03',
+                    fillOpacity: 0.3,
+                    radius: 10000
+                    }).addTo(layer);
+                })
+                layer.addTo(map)
+            } 
+        }
     </script>
-
-
   </body>
 </html>
