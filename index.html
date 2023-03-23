@@ -59,6 +59,9 @@
             .mobile {
                 display: none;
             }
+            .select2__options{
+        font-size:24px !important;
+ }
             #map {
                 width: 70%;
                 height: 100vh;
@@ -115,7 +118,7 @@
                 float: left;
             }
             select {
-                width: 90%;
+                width: 95%;
                 margin-left: 5%;
                 padding: 16px 20px;
                 border: none;
@@ -147,13 +150,13 @@
     <div id = "selectors">
       <div class="title desktop">Migration Tracker</div>
       <div class="container">
-        <select class="js-example-basic-single selectOld" id="notableList" name="notableList" style="width: 80%" onChange="mapBirds(this.value)">
+        <select class="js-example-basic-single selectOld" id="notableList" name="notableList" style="width: 95%" onChange="mapBirds(this.value)">
             <option value="" disabled selected>Notable birds...</option>
         </select>
       </div>
 
       <div class="container">
-        <select class="js-example-basic-single selectOld" id="oregonList" name="oregonList" style="width: 80%" onChange="mapBirds(this.value)">
+        <select class="js-example-basic-single selectOld" id="oregonList" name="oregonList" style="width: 95%" onChange="mapBirds(this.value)">
             <option value="" disabled selected>Oregon birds...</option>
         </select>
       </div>
