@@ -12,10 +12,11 @@
                 margin: 0;
         }
         .title {
+            height: 5vh;
             text-align: center;
             text-align: center;
             font-family: -apple-system,system-ui,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-            font-size: 24px;
+            font-size: 1.5em;
             font-weight: 500;
             margin: 10px;
         }
@@ -64,14 +65,14 @@
                 display: none;
             }
             #map {
-                width: 100vw;
+                width: 100%;
                 height: 60vh;
                 float: left;
                 border-radius: 12px;
             }
             #selectors {
-                width: 100vw;
-                height: 40vh;
+                width: 100%;
+                height: 35%;
                 float: left;
             }
             select {
@@ -107,11 +108,11 @@
 
   </head>
   <body>
-    <div class="title mobile">Migration Tracker</div>
-    <h3 class="mobile"></h3>
-    <div id="map"></div>
-    <div class="title desktop">Migration Tracker</div>
+        <div class="title mobile">Migration Tracker</div>
+        <div id="map"></div>
+        
     <div id = "selectors">
+        <div class="title desktop">Migration Tracker</div>
         <form>
             <select id="notableList" name="notableList" onChange="mapBirds(this.value)">
             <option value="" disabled selected>Notable birds...</option>
