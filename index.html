@@ -99,6 +99,12 @@
                 font-size: 12px;
                 font-weight: 500;
             }
+            #countContainer{
+                text-align: center;
+                font-family: -apple-system,system-ui,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+                font-size: 12px;
+                font-weight: 500;
+            }
             .container{
                 text-align: center;
                 margin-bottom: 10px;
@@ -139,6 +145,12 @@
                 font-size: 12px;
                 font-weight: 500;
             }
+            #countContainer{
+                text-align: center;
+                font-family: -apple-system,system-ui,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+                font-size: 12px;
+                font-weight: 500;
+            }
         }
 
     </style>    
@@ -173,6 +185,9 @@
       <div id="dateContainer">
         <div id="date"></div>
       </div>
+      <div id="countContainer">
+        <div id="counts"></div>
+      </div>
     </div>
     
     <script>
@@ -203,6 +218,8 @@
         var layer = L.layerGroup()
         var dateObs = []
         var birdDate = document.getElementById("date");
+        var siteCount
+        var totalCount
 
         fetch(enpointOregonRecent, {
         headers: {
@@ -264,6 +281,8 @@
 
 
         function mapBirds(comName) {
+            siteCount = 0
+            totalCount = 0
             birdDate.textContent = "Last 30 Days";
             var fg = L.featureGroup();
             var specCode
@@ -282,11 +301,14 @@
                 birdData = data
                 layer.clearLayers()
                 data.forEach(observation => {
+                    if (observation.howMany) {
+                        totalCount = totalCount + observation.howMany
+                    }
+                    siteCount = siteCount + 1
                     var currDateParts = observation.obsDt.substring(0,10).split('-')
                     var currDate = Number(currDateParts[0]+currDateParts[1]+currDateParts[2])
                     observation.obsDt = currDate
                 });
-                
                 if (data.length > 1) {   
                                  
                     data.forEach(observation => {
@@ -331,8 +353,7 @@
                     document.getElementById("dateRange").max = datesObjArr.length;
                     document.getElementById("dateRange").min = 1;
                     document.getElementById("dateRange").value = 30;
-                    
-
+                    document.getElementById("counts").textContent = `Site Count: ${siteCount.toLocaleString()} | Total Count: ${totalCount.toLocaleString()}`
                 } else {
                     farAwayMap(specCode)
                 }
@@ -342,6 +363,8 @@
         }
 
         function farAwayMap(speciesCode) {
+            siteCount = 0
+            totalCount = 0
             var fg = L.featureGroup();
             fetch(`https://api.ebird.org/v2/data/nearest/geo/recent/${speciesCode}?lat=44.3&lng=-121.2&back=30`, {
             headers: {
@@ -353,16 +376,20 @@
                 birdData = data
                 if (data.length > 0) {
                     data.forEach(observation => {
-                    var currDateParts = observation.obsDt.substring(0,10).split('-')
-                    var currDate = Number(currDateParts[0]+currDateParts[1]+currDateParts[2])
-                    observation.obsDt = currDate
-                    L.circle([observation.lat, observation.lng], {
-                        color: 'blue',
-                        fillColor: 'blue',
-                        fillOpacity: 0.7,
-                        radius: 50000
-                    }).bindPopup("Date: "+observation.obsDt.toString().slice(4,6)+"/"+observation.obsDt.toString().slice(6,8)+"/"+observation.obsDt.toString().slice(0,4)+`</br>Location: `+observation.locName+`</br>Bird Info: <a target='_blank' href='https://ebird.org/species/${speciesCode}'>More Info</a>`).addTo(layer);
-                    L.marker([observation.lat, observation.lng]).addTo(fg)
+                        if (observation.howMany) {
+                            totalCount = totalCount + observation.howMany
+                        }
+                        siteCount = siteCount + 1
+                        var currDateParts = observation.obsDt.substring(0,10).split('-')
+                        var currDate = Number(currDateParts[0]+currDateParts[1]+currDateParts[2])
+                        observation.obsDt = currDate
+                        L.circle([observation.lat, observation.lng], {
+                            color: 'blue',
+                            fillColor: 'blue',
+                            fillOpacity: 0.7,
+                            radius: 50000
+                        }).bindPopup("Date: "+observation.obsDt.toString().slice(4,6)+"/"+observation.obsDt.toString().slice(6,8)+"/"+observation.obsDt.toString().slice(0,4)+`</br>Location: `+observation.locName+`</br>Bird Info: <a target='_blank' href='https://ebird.org/species/${speciesCode}'>More Info</a>`).addTo(layer);
+                        L.marker([observation.lat, observation.lng]).addTo(fg)
                     })
                     layer.addTo(map)
                     map.fitBounds(fg.getBounds());
@@ -398,8 +425,10 @@
                     document.getElementById("dateRange").min = 1;
                     document.getElementById("dateRange").value = 30;
                     birdDate.textContent = "Not many on West Coast. Closest in last 30 Days";
+                    document.getElementById("counts").textContent = `Site Count: ${siteCount.toLocaleString()} | Total Count: ${totalCount.toLocaleString()}`
                 } else {
                     birdDate.textContent = "No birds reported in last 30 days";
+                    document.getElementById("counts").textContent = ''
                 }
                 
             })
