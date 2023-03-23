@@ -59,9 +59,7 @@
             .mobile {
                 display: none;
             }
-            .select2__options{
-        font-size:24px !important;
- }
+
             #map {
                 width: 70%;
                 height: 100vh;
@@ -85,7 +83,16 @@
                 font-size: 24px;
                 font-weight: 500;
             }
-
+            .select2-selection {
+                font-family: -apple-system,system-ui,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+                font-size: 16px;
+                font-weight: 500;
+            }
+            .select2-container {
+                font-family: -apple-system,system-ui,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+                font-size: 16px;
+                font-weight: 500;
+            }
             #dateContainer{
                 text-align: center;
                 font-family: -apple-system,system-ui,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
@@ -354,7 +361,7 @@
                         fillColor: 'blue',
                         fillOpacity: 0.7,
                         radius: 50000
-                    }).bindPopup("Date: "+observation.obsDt+`</br>Bird Info: <a target='_blank' href='https://ebird.org/species/${speciesCode}'>More Info</a>`).addTo(layer);
+                    }).bindPopup("Date: "+observation.obsDt.toString().slice(4,6)+"/"+observation.obsDt.toString().slice(6,8)+"/"+observation.obsDt.toString().slice(0,4)+`</br>Location: `+observation.locName+`</br>Bird Info: <a target='_blank' href='https://ebird.org/species/${speciesCode}'>More Info</a>`).addTo(layer);
                     L.marker([observation.lat, observation.lng]).addTo(fg)
                     })
                     layer.addTo(map)
