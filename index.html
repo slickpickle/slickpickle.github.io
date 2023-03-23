@@ -20,6 +20,35 @@
             font-weight: 500;
             margin: 10px;
         }
+
+        .slider {
+            -webkit-appearance: none;
+            width: 80%;
+            margin-left: 10%;
+            margin-top:20px;
+            height: 15px;
+            background: #EF4765;
+            outline: none;
+            border: 5px solid #FF9A5A;
+            border-radius: 8px;
+            opacity: 0.9;
+            -webkit-transition: .2s;
+            transition: opacity .2s;
+          }
+          .slider:hover {
+            opacity: 1;
+          }
+
+          .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 40px;
+            background: #EF4765;
+            cursor: pointer;
+            border: 5px solid #FF9A5A;
+            border-radius: 4px;
+          }
         @media (min-width: 767px) {
             .mobile {
                 display: none;
@@ -44,15 +73,7 @@
                 background-color: #f1f1f1;
                 margin-top:10px;
             }
-            input {
-                width: 80%;
-                margin-left: 5%;
-                padding: 16px 20px;
-                border: none;
-                border-radius: 4px;
-                background-color: #f1f1f1;
-                margin-top:10px;
-            }
+
             #dateContainer{
                 text-align: center;
                 font-family: -apple-system,system-ui,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
@@ -63,6 +84,10 @@
         @media (max-width: 766px) {
             .desktop {
                 display: none;
+            }
+            .container {
+                width: 50%;
+                float: left;
             }
             #map {
                 width: 100%;
@@ -77,15 +102,6 @@
             }
             select {
                 width: 90%;
-                margin-left: 5%;
-                padding: 16px 20px;
-                border: none;
-                border-radius: 4px;
-                background-color: #f1f1f1;
-                margin-top:10px;
-            }
-            input {
-                width: 80%;
                 margin-left: 5%;
                 padding: 16px 20px;
                 border: none;
@@ -113,18 +129,21 @@
         
     <div id = "selectors">
         <div class="title desktop">Migration Tracker</div>
+        <div class="container">
         <form>
             <select id="notableList" name="notableList" onChange="mapBirds(this.value)">
             <option value="" disabled selected>Notable birds...</option>
             </select>
         </form>
-        <div class="container">
-            <div class="text-container">
-                <input type="text" list="oregonList" placeholder="Birds in Oregon..." onChange="mapBirds(this.value)" />
-                <datalist id="oregonList"></datalist>
-            </div>
         </div>
-        <div class="slidecontainer">
+        <div class="container">
+            <form>
+                <select id="oregonList" name="oregonList" onChange="mapBirds(this.value)">
+                <option value="" disabled selected>Oregon birds...</option>
+                </select>
+            </form>
+        </div>
+        <div class="sliderContainer">
             <input type="range" min="1" max="100" value="50" class="slider" id="dateRange">
         </div>
         <div id="dateContainer"><div id="date"></div></div>
