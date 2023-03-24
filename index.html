@@ -458,7 +458,8 @@
                     fillColor: '#f03',
                     fillOpacity: 0.3,
                     radius: 10000
-                    }).addTo(layer);
+                    }).bindPopup("Date: "+observation.obsDt.toString().slice(4,6)+"/"+observation.obsDt.toString().slice(6,8)+"/"+observation.obsDt.toString().slice(0,4)+`</br>Location: `+observation.locName+`</br>Bird Info: <a target='_blank' href='https://ebird.org/species/${observation.speciesCode}'>More Info</a>`).addTo(layer);
+
                 })
                 layer.addTo(map)
             } 
