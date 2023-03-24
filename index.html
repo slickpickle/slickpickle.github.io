@@ -58,16 +58,19 @@
             .mobile {
                 display: none;
             }
-
-            #map {
-                width: 70%;
-                height: 100vh;
+            #mapContainer {
+                position: relative;
                 float: left;
-                border-radius: 12px;
+                height: 100vh;
+                width: 70%;
+            }
+            #map {
+                width: 100%;
+                height: 100%;
                 z-index: 1;
             }
             img {
-            width: 300px;;
+                width: 300px;;
             }
             .legend {
                 position: absolute;
@@ -130,27 +133,31 @@
                 float: left;
                 text-align: center;
             }
+            #mapContainer {
+                position: relative;
+                float: left;
+                height: 65vh;
+                width: 100%;
+            }
             #map {
                 width: 100%;
-                height: 60vh;
-                float: left;
-                border-radius: 12px;
+                height: 100%;
                 z-index: 1;
             }
             img {
-            width: 200px;;
+                width: 200px;;
             }
             .legend {
                 position: absolute;
                 bottom: 0;
                 left: 0;
                 z-index: 9;
-                margin-left: 5%;
-                margin-bottom: 40%;
+                margin-left: 20px;
+                margin-bottom: 30px;
             }
             #selectors {
                 width: 100%;
-                height: 35%;
+                height: 25vh;
                 float: left;
             }
             select {
@@ -184,8 +191,10 @@
   </head>
   <body>
     <div class="title mobile">Migration Tracker</div>
-    <div id="map"></div>
-    <div class="legend"><img src="Legend.png" alt=""></div>   
+    <div id="mapContainer">
+        <div class="legend"><img src="Legend.png" alt=""></div>
+        <div id="map"></div>
+    </div>
     <div id = "selectors">
       <div class="title desktop">Migration Tracker</div>
       <div class="container">
