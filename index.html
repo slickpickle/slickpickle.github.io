@@ -26,7 +26,6 @@
             font-weight: 500;
             margin: 10px;
         }
-
         .slider {
             -webkit-appearance: none;
             width: 80%;
@@ -65,6 +64,18 @@
                 height: 100vh;
                 float: left;
                 border-radius: 12px;
+                z-index: 1;
+            }
+            img {
+            width: 300px;;
+            }
+            .legend {
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                z-index: 9;
+                margin-left: 20px;
+                margin-bottom: 20px;
             }
             #selectors {
                 width: 30%;
@@ -124,6 +135,18 @@
                 height: 60vh;
                 float: left;
                 border-radius: 12px;
+                z-index: 1;
+            }
+            img {
+            width: 200px;;
+            }
+            .legend {
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                z-index: 9;
+                margin-left: 5%;
+                margin-bottom: 40%;
             }
             #selectors {
                 width: 100%;
@@ -160,12 +183,9 @@
 
   </head>
   <body>
-
-
-
-        <div class="title mobile">Migration Tracker</div>
-        <div id="map"></div>
-        
+    <div class="title mobile">Migration Tracker</div>
+    <div id="map"></div>
+    <div class="legend"><img src="Legend.png" alt=""></div>   
     <div id = "selectors">
       <div class="title desktop">Migration Tracker</div>
       <div class="container">
