@@ -1,312 +1,23 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>Bird Migrations</title>
-    <meta content="width=device-width, initial-scale=1" name="viewport" />
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/css/select2.min.css" rel="stylesheet" />
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script><!-- jQuery base library needed -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.min.js"></script> 
-    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css"
-    integrity="sha256-kLaT2GOSpHechhsozzB+flnD+zUyjE2LlfWPgU04xyI="
-    crossorigin=""/>
+<head>
+<title>Bird Migrations</title>
+<meta content="width=device-width, initial-scale=1" name="viewport" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/css/select2.min.css" rel="stylesheet" />
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script><!-- jQuery base library needed -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.min.js"></script> 
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<link rel="stylesheet" href="bird.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css"
+integrity="sha256-kLaT2GOSpHechhsozzB+flnD+zUyjE2LlfWPgU04xyI="
+crossorigin=""/>
+<script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"
+integrity="sha256-WBkoXOwTeyKclOHuWtc+i2uENFpDZ9YPdf5Hf+D7ewM="
+crossorigin=""></script>
 
-    <style>
-        body{
-                padding: 0;
-                margin: 0;
-        }
-        .title {
-            height: 5vh;
-            text-align: center;
-            text-align: center;
-            font-family: -apple-system,system-ui,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-            font-size: 1.5em;
-            font-weight: 500;
-            margin: 10px;
-        }
-        .slider {
-            -webkit-appearance: none;
-            width: 80%;
-            margin-left: 10%;
-            margin-top:20px;
-            height: 15px;
-            background: #EF4765;
-            outline: none;
-            border: 5px solid #FF9A5A;
-            border-radius: 8px;
-            opacity: 0.9;
-            -webkit-transition: .2s;
-            transition: opacity .2s;
-          }
-          .slider:hover {
-            opacity: 1;
-          }
-
-          .slider::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            appearance: none;
-            width: 20px;
-            height: 40px;
-            background: #EF4765;
-            cursor: pointer;
-            border: 5px solid #FF9A5A;
-            border-radius: 4px;
-          }
-        @media (min-width: 767px) {
-            .mobile {
-                display: none;
-            }
-            #mapContainer {
-                position: relative;
-                float: left;
-                height: 100vh;
-                width: 70%;
-            }
-            #map {
-                width: 100%;
-                height: 100%;
-                z-index: 1;
-            }
-            img {
-                width: 300px;;
-            }
-            #legend {
-                display: none;
-                position: absolute;
-                bottom: 0;
-                left: 0;
-                z-index: 9;
-                margin-left: 20px;
-                margin-bottom: 20px;
-            }
-            #selectors {
-                width: 30%;
-                height: 100vh;
-                float: left;
-            }
-            select {
-                width: 90%;
-                margin-left: 5%;
-                padding: 16px 20px;
-                border: none;
-                border-radius: 4px;
-                background-color: #f1f1f1;
-                margin-top:10px;
-                font-family: -apple-system,system-ui,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-                font-size: 24px;
-                font-weight: 500;
-            }
-            .select2-selection {
-                font-family: -apple-system,system-ui,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-                font-size: 16px;
-                font-weight: 500;
-            }
-            .select2-container {
-                font-family: -apple-system,system-ui,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-                font-size: 16px;
-                font-weight: 500;
-            }
-            #dateContainer{
-                text-align: center;
-                font-family: -apple-system,system-ui,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-                font-size: 12px;
-                font-weight: 500;
-            }
-            #countContainer{
-                text-align: center;
-                font-family: -apple-system,system-ui,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-                font-size: 12px;
-                font-weight: 500;
-            }
-            .container{
-                text-align: center;
-                margin-bottom: 10px;
-            }
-            #notableBox {
-                position: absolute;
-                top: 0;
-                right: 0;
-                z-index: 9;
-                margin-right: 30px;
-                margin-top: 20px;           
-            }
-            .button-Notables {
-                align-items: center;
-                appearance: none;
-                background-color: #FCFCFD;
-                border-radius: 4px;
-                border-width: 0;
-                box-shadow: rgba(45, 35, 66, 0.4) 0 2px 4px,rgba(45, 35, 66, 0.3) 0 7px 13px -3px,#D6D6E7 0 -3px 0 inset;
-                box-sizing: border-box;
-                color: #36395A;
-                cursor: pointer;
-                display: inline-flex;
-                font-family: "JetBrains Mono",monospace;
-                height: 48px;
-                justify-content: center;
-                line-height: 1;
-                list-style: none;
-                overflow: hidden;
-                padding-left: 16px;
-                padding-right: 16px;
-                position: relative;
-                text-align: left;
-                text-decoration: none;
-                transition: box-shadow .15s,transform .15s;
-                user-select: none;
-                -webkit-user-select: none;
-                touch-action: manipulation;
-                white-space: nowrap;
-                will-change: box-shadow,transform;
-                font-size: 18px;
-                }
-
-                .button-Notables:focus {
-                box-shadow: #D6D6E7 0 0 0 1.5px inset, rgba(45, 35, 66, 0.4) 0 2px 4px, rgba(45, 35, 66, 0.3) 0 7px 13px -3px, #D6D6E7 0 -3px 0 inset;
-                }
-
-                .button-Notables:hover {
-                box-shadow: rgba(45, 35, 66, 0.4) 0 4px 8px, rgba(45, 35, 66, 0.3) 0 7px 13px -3px, #D6D6E7 0 -3px 0 inset;
-                transform: translateY(-2px);
-                }
-
-                .button-Notables:active {
-                box-shadow: #D6D6E7 0 3px 7px inset;
-                transform: translateY(2px);
-                }
-        }
-        @media (max-width: 766px) {
-            .desktop {
-                display: none;
-            }
-            .container {
-                width: 50%;
-                float: left;
-                text-align: center;
-            }
-            #mapContainer {
-                position: relative;
-                float: left;
-                height: 65vh;
-                width: 100%;
-            }
-            #map {
-                width: 100%;
-                height: 100%;
-                z-index: 1;
-            }
-            img {
-                width: 40vw;
-            }
-            #legend {
-                display: none;
-                position: absolute;
-                bottom: 0;
-                left: 0;
-                z-index: 9;
-                margin-left: 20px;
-                margin-bottom: 30px;
-            }
-            #selectors {
-                width: 100%;
-                height: 20vh;
-                float: left;
-                margin-top: 5vh;
-            }
-            select {
-                width: 95%;
-                margin-left: 5%;
-                padding: 16px 20px;
-                border: none;
-                border-radius: 4px;
-                background-color: #f1f1f1;
-                margin-top:10px;
-            }
-            .select2-selection {
-                font-family: -apple-system,system-ui,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-                font-size: 12px;
-                font-weight: 500;
-            }
-            .select2-container {
-                font-family: -apple-system,system-ui,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-                font-size: 12px;
-                font-weight: 500;
-            }
-            #dateContainer{
-                text-align: center;
-                font-family: -apple-system,system-ui,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-                font-size: 12px;
-                font-weight: 500;
-            }
-            #countContainer{
-                text-align: center;
-                font-family: -apple-system,system-ui,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-                font-size: 12px;
-                font-weight: 500;
-            }
-            #notableBox {
-                position: absolute;
-                top: 0;
-                right: 0;
-                z-index: 9;
-                margin-right: 30px;
-                margin-top: 20px;           
-            }
-            .button-Notables {
-                align-items: center;
-                appearance: none;
-                background-color: #FCFCFD;
-                border-radius: 4px;
-                border-width: 0;
-                box-shadow: rgba(45, 35, 66, 0.4) 0 2px 4px,rgba(45, 35, 66, 0.3) 0 7px 13px -3px,#D6D6E7 0 -3px 0 inset;
-                box-sizing: border-box;
-                color: #36395A;
-                cursor: pointer;
-                display: inline-flex;
-                font-family: "JetBrains Mono",monospace;
-                height: 36px;
-                justify-content: center;
-                line-height: 1;
-                list-style: none;
-                overflow: hidden;
-                padding-left: 12px;
-                padding-right: 12px;
-                position: relative;
-                text-align: left;
-                text-decoration: none;
-                transition: box-shadow .15s,transform .15s;
-                user-select: none;
-                -webkit-user-select: none;
-                touch-action: manipulation;
-                white-space: nowrap;
-                will-change: box-shadow,transform;
-                font-size: 14px;
-                }
-
-                .button-Notables:focus {
-                box-shadow: #D6D6E7 0 0 0 1.5px inset, rgba(45, 35, 66, 0.4) 0 2px 4px, rgba(45, 35, 66, 0.3) 0 7px 13px -3px, #D6D6E7 0 -3px 0 inset;
-                }
-
-                .button-Notables:hover {
-                box-shadow: rgba(45, 35, 66, 0.4) 0 4px 8px, rgba(45, 35, 66, 0.3) 0 7px 13px -3px, #D6D6E7 0 -3px 0 inset;
-                transform: translateY(-2px);
-                }
-
-                .button-Notables:active {
-                box-shadow: #D6D6E7 0 3px 7px inset;
-                transform: translateY(2px);
-                }
-        }
-
-    </style>    
-    <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"
-    integrity="sha256-WBkoXOwTeyKclOHuWtc+i2uENFpDZ9YPdf5Hf+D7ewM="
-    crossorigin=""></script>
-
-  </head>
-  <body>
+</head>
+<body>
     <div class="title mobile">Migration Tracker</div>
     <div id="mapContainer">
         <div id="legend"><img src="Legend.png" alt=""></div>
@@ -316,32 +27,31 @@
         </div>
     </div>
     <div id = "selectors">
-      <div class="title desktop">Migration Tracker</div>
-      <div class="container">
+        <div class="title desktop">Migration Tracker</div>
+        <div class="container">
         <select class="js-example-basic-single selectOld" id="notableList" name="notableList" style="width: 95%" onChange="mapBirds(this.value)">
             <option value="" disabled selected>Notable birds...</option>
         </select>
-      </div>
+        </div>
 
-      <div class="container">
+        <div class="container">
         <select class="js-example-basic-single selectOld" id="oregonList" name="oregonList" style="width: 95%" onChange="mapBirds(this.value)">
             <option value="" disabled selected>Oregon birds...</option>
         </select>
-      </div>
-      <div class="sliderContainer">
+        </div>
+        <div class="sliderContainer">
             <input type="range" min="1" max="100" value="50" class="slider" id="dateRange">
-      </div>
-      <div id="dateContainer">
+        </div>
+        <div id="dateContainer">
         <div id="date"></div>
-      </div>
-      <div id="countContainer">
+        </div>
+        <div id="countContainer">
         <div id="counts"></div>
         <div id="notableList"></div>
-      </div>
+        </div>
     </div>
-    
-    <script>
 
+    <script>
         $(document).ready(function() {
             $('.js-example-basic-single').select2();
         });
@@ -553,7 +263,7 @@
                             "dateTxt": date.toString().slice(4,6)+"/"+date.toString().slice(6,8)+"/"+date.toString().slice(0,4)
                         }
                         datesObjArr.push(dateObj)
-          
+            
                     })
                     
                     var monthQuarters = Math.max(...datesObjArr.map(o => o.id))/4
@@ -671,7 +381,7 @@
                     layer.addTo(map)
                     map.fitBounds(fg.getBounds());
 
- 
+
 
                     document.getElementById("dateRange").max = datesObjArr.length;
                     document.getElementById("dateRange").min = 1;
@@ -733,7 +443,7 @@
             }   
         }
 
-        function mapme(bird) {
+        function mapNotableSingle(bird) {
             layer.clearLayers()
             fullList.forEach(type => {
                 if (bird == type.comName) {
@@ -770,6 +480,7 @@
                 })
                 .then(response => response.json())
                 .then(data => {
+                    console.log(data)
                     data.sort((a, b) => a.obsDt.localeCompare(b.obsDt));
                     birdData = data
                     layer.clearLayers()
@@ -794,7 +505,7 @@
                             var mydiv = document.getElementById("counts");
                             var aTag = document.createElement('a');
                             aTag.setAttribute('href',"#");
-                            aTag.setAttribute('onclick',"mapme(`" + bird + "`)");
+                            aTag.setAttribute('onclick',"mapNotableSingle(`" + bird + "`)");
                             aTag.innerText = bird;
                             var br = document.createElement('br');
                             mydiv.appendChild(aTag);
@@ -846,5 +557,5 @@
             }
         }
     </script>
-  </body>
+</body>
 </html>
