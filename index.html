@@ -43,11 +43,11 @@ crossorigin=""></script>
             <input type="range" min="1" max="100" value="50" class="slider" id="dateRange">
         </div>
         <div id="dateContainer">
-        <div id="date"></div>
+          <div id="date"></div>
         </div>
         <div id="countContainer">
-        <div id="counts"></div>
-        <div id="notableList"></div>
+          <div id="notableList"></div>
+          <div id="counts"></div>
         </div>
     </div>
 
@@ -205,7 +205,7 @@ crossorigin=""></script>
 
 
         function mapBirds(comName) {
-            document.getElementById("legend").style.display = "block";          
+                      
             siteCount = 0
             totalCount = 0
             symbType = ''
@@ -238,7 +238,7 @@ crossorigin=""></script>
                     observation.obsDt = currDate
                 });
 
-                if (data.length > 1) {   
+                if (data.length > 0) {   
                     data.forEach(observation => {
                         dateObs.push(observation.obsDt)
                     })
@@ -289,12 +289,13 @@ crossorigin=""></script>
                         L.marker([observation.lat, observation.lng]).addTo(fg)
                     })
                     layer.addTo(map)
-                    map.fitBounds(fg.getBounds());
+                    map.fitBounds(fg.getBounds(), {maxZoom: 9});
 
                     document.getElementById("dateRange").max = datesObjArr.length;
                     document.getElementById("dateRange").min = 1;
                     document.getElementById("dateRange").value = 30;
                     document.getElementById("counts").textContent = `Site Count: ${siteCount.toLocaleString()} | Total Count: ${totalCount.toLocaleString()}`
+                    document.getElementById("legend").style.display = "block";
                 } else {
                     farAwayMap(specCode)
                 }
@@ -305,6 +306,7 @@ crossorigin=""></script>
 
         function farAwayMap(speciesCode) {
             siteCount = 0
+            symbType = "farAway"
             totalCount = 0
             var fg = L.featureGroup();
             fetch(`https://api.ebird.org/v2/data/nearest/geo/recent/${speciesCode}?lat=44.3&lng=-121.2&back=30`, {
@@ -376,7 +378,7 @@ crossorigin=""></script>
                         }
 
                         L.circle([observation.lat, observation.lng], symbology).bindPopup("Date: "+observation.obsDt.toString().slice(4,6)+"/"+observation.obsDt.toString().slice(6,8)+"/"+observation.obsDt.toString().slice(0,4)+`</br>Location: `+observation.locName+`</br>Bird Info: <a target='_blank' href='https://ebird.org/species/${speciesCode}'>More Info</a>`).addTo(layer);
-                        L.marker([observation.lat, observation.lng]).addTo(fg)
+                        L.marker([observation.lat, observation.lng]).addTo(fg, {maxZoom: 9})
                     })
                     layer.addTo(map)
                     map.fitBounds(fg.getBounds());
@@ -386,8 +388,9 @@ crossorigin=""></script>
                     document.getElementById("dateRange").max = datesObjArr.length;
                     document.getElementById("dateRange").min = 1;
                     document.getElementById("dateRange").value = 30;
-                    birdDate.textContent = "Not many on West Coast. Closest in last 30 Days";
+                    birdDate.textContent = "No sightings on West Coast. Closest in last 30 Days";
                     document.getElementById("counts").textContent = `Site Count: ${siteCount.toLocaleString()} | Total Count: ${totalCount.toLocaleString()}`
+                    document.getElementById("legend").style.display = "block";
                 } else {
                     document.getElementById("legend").style.display = "none";          
                     birdDate.textContent = "No birds reported in last 30 days";
@@ -417,6 +420,29 @@ crossorigin=""></script>
                             L.marker([observation.lat, observation.lng]).bindPopup("Species: "+observation.comName+"<br>Date: "+observation.obsDt.toString().slice(4,6)+"/"+observation.obsDt.toString().slice(6,8)+"/"+observation.obsDt.toString().slice(0,4)+`</br>Location: `+observation.locName+`</br>Bird Info: <a target='_blank' href='https://ebird.org/species/` + observation.speciesCode +`'>More Info</a>`).addTo(layer);
                         })
                         layer.addTo(map)
+            } else if (symbType == "farAway") {
+                var bbd = birdData.filter(function (el){
+                return el.obsDt <= tempDateInt
+                })
+                if(bbd.length > 0) {
+                    var monthQuarters = Math.max(...datesObjArr.map(o => o.id))/4
+                    birdDate.textContent = tempDateTxt;
+
+                    bbd.forEach(observation => {
+                        if (observation.dateIndex < monthQuarters) {
+                            symbology = firstFarAway
+                        } else if (observation.dateIndex >= monthQuarters && observation.dateIndex < monthQuarters*2) {
+                            symbology = secondFarAway
+                        } else if (observation.dateIndex >= monthQuarters*2 && observation.dateIndex < monthQuarters*3) {
+                            symbology = thirdFarAway
+                        } else {
+                            symbology = fourthFarAway
+                        }
+                        L.circle([observation.lat, observation.lng], symbology).bindPopup("Date: "+observation.obsDt.toString().slice(4,6)+"/"+observation.obsDt.toString().slice(6,8)+"/"+observation.obsDt.toString().slice(0,4)+`</br>Location: `+observation.locName+`</br>Bird Info: <a target='_blank' href='https://ebird.org/species/${observation.speciesCode}'>More Info</a>`).addTo(layer);
+
+                    })
+                    layer.addTo(map)
+                } 
             } else {
                 var bbd = birdData.filter(function (el){
                 return el.obsDt <= tempDateInt
@@ -440,11 +466,12 @@ crossorigin=""></script>
                     })
                     layer.addTo(map)
                 } 
-            }   
+            } 
         }
 
         function mapNotableSingle(bird) {
             layer.clearLayers()
+            var fg = L.featureGroup();
             fullList.forEach(type => {
                 if (bird == type.comName) {
                     specCode = type.speciesCode
@@ -458,17 +485,21 @@ crossorigin=""></script>
                 .then(response => response.json())
                 .then(data => {
                     data.forEach(observation => {
-                            var currDateParts = observation.obsDt.substring(0,10).split('-')
-                            var currDate = Number(currDateParts[0]+currDateParts[1]+currDateParts[2])
-                            observation.obsDt = currDate
-                            L.marker([observation.lat, observation.lng]).bindPopup("Species: "+observation.comName+"<br>Date: "+observation.obsDt.toString().slice(4,6)+"/"+observation.obsDt.toString().slice(6,8)+"/"+observation.obsDt.toString().slice(0,4)+`</br>Location: `+observation.locName+`</br>Bird Info: <a target='_blank' href='https://ebird.org/species/` + observation.speciesCode +`'>More Info</a>`).addTo(layer);
-                        })
-                })
-            
+                      var currDateParts = observation.obsDt.substring(0,10).split('-')
+                      var currDate = Number(currDateParts[0]+currDateParts[1]+currDateParts[2])
+                      observation.obsDt = currDate
+                      L.marker([observation.lat, observation.lng]).addTo(fg)
+                      L.marker([observation.lat, observation.lng]).bindPopup("Species: "+observation.comName+"<br>Date: "+observation.obsDt.toString().slice(4,6)+"/"+observation.obsDt.toString().slice(6,8)+"/"+observation.obsDt.toString().slice(0,4)+`</br>Location: `+observation.locName+`</br>Bird Info: <a target='_blank' href='https://ebird.org/species/` + observation.speciesCode +`'>More Info</a>`).addTo(layer);
+                    })
+                    map.fitBounds(fg.getBounds(), {maxZoom: 14});
+                })            
             }
+
+
 
         function LocalNotables() {
             if (notables == "off") {
+                 document.getElementById("legend").style.display = "none";
                 document.getElementById("counts").textContent = ''
                 notables = "on"
                 symbType = 'marker'
@@ -500,16 +531,17 @@ crossorigin=""></script>
                         birdListSet.forEach(bird =>{
                             notableBirdList.push(bird)
                         })
-                        
+                        notableBirdList.sort()
                         notableBirdList.forEach(bird => {
-                            var mydiv = document.getElementById("counts");
+                            var countDiv = document.getElementById("counts");
+                            var buttonDiv = document.createElement('div');
+                            buttonDiv.setAttribute('class',"notableListButton")
                             var aTag = document.createElement('a');
                             aTag.setAttribute('href',"#");
                             aTag.setAttribute('onclick',"mapNotableSingle(`" + bird + "`)");
-                            aTag.innerText = bird;
-                            var br = document.createElement('br');
-                            mydiv.appendChild(aTag);
-                            mydiv.appendChild(br);
+                            buttonDiv.innerText = bird;
+                            countDiv.appendChild(aTag);
+                            aTag.appendChild(buttonDiv)
                         })
                         datesObjArr = []
                         dateArr = []
