@@ -56,12 +56,10 @@ crossorigin=""></script>
         });
 
         var map = L.map('map').setView([40.8, -119.5], 4);
-        L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/toner-lite/{z}/{x}/{y}{r}.{ext}', {
-            attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>',
-            subdomains: 'abcd',
-            minZoom: 0,
-            maxZoom: 20,
-            ext: 'png'
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager_labels_under/{z}/{x}/{y}{r}.png', {
+          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+          subdomains: 'abcd',
+          maxZoom: 20
         }).addTo(map);
 
         const apiKey = "g0gbj09j2s1b"; // replace with your own eBird API key      
@@ -564,7 +562,6 @@ crossorigin=""></script>
 
 
         function mapNotableSingle(bird) {
-            console.log(birdData)
             layer.clearLayers()
             var fg = L.featureGroup();
             birdData.forEach(observation => {
