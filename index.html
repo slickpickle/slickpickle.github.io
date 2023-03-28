@@ -336,6 +336,7 @@
       </div>
       <div id="countContainer">
         <div id="counts"></div>
+        <div id="notableList"></div>
       </div>
     </div>
     
@@ -371,6 +372,8 @@
         var siteCount
         var totalCount
         var symbology
+        var symbType
+        var notableBirdList = []
         var first = {
             color: '#d97357',
             opacity: 0.1,
@@ -495,13 +498,15 @@
             document.getElementById("legend").style.display = "block";          
             siteCount = 0
             totalCount = 0
+            symbType = ''
+            notables = 'off'
             birdDate.textContent = "Last 30 Days";
             var fg = L.featureGroup();
             var specCode
             fullList.forEach(type => {
-            if (comName == type.comName) {
-                specCode = type.speciesCode
-            }
+                if (comName == type.comName) {
+                    specCode = type.speciesCode
+                }
             })
             fetch(`https://api.ebird.org/v2/data/obs/US-OR/recent/${specCode}?back=30&r=US-ID,US-CA,US-NV,US-WA,US-OR`, {
             headers: {
@@ -694,33 +699,68 @@
                 tempDateTxt = date.dateTxt
             }
             })
-            var bbd = birdData.filter(function (el){
-            return el.obsDt <= tempDateInt
-            })
-            if(bbd.length > 0) {
-                var monthQuarters = Math.max(...datesObjArr.map(o => o.id))/4
-                birdDate.textContent = tempDateTxt;
-
-                bbd.forEach(observation => {
-                    if (observation.dateIndex < monthQuarters) {
-                        symbology = first
-                    } else if (observation.dateIndex >= monthQuarters && observation.dateIndex < monthQuarters*2) {
-                        symbology = second
-                    } else if (observation.dateIndex >= monthQuarters*2 && observation.dateIndex < monthQuarters*3) {
-                        symbology = third
-                    } else {
-                        symbology = fourth
-                    }
-                    L.circle([observation.lat, observation.lng], symbology).bindPopup("Date: "+observation.obsDt.toString().slice(4,6)+"/"+observation.obsDt.toString().slice(6,8)+"/"+observation.obsDt.toString().slice(0,4)+`</br>Location: `+observation.locName+`</br>Bird Info: <a target='_blank' href='https://ebird.org/species/${observation.speciesCode}'>More Info</a>`).addTo(layer);
-
+            if (symbType == "marker"){
+                var bbd = birdData.filter(function (el){
+                return el.obsDt <= tempDateInt
                 })
-                layer.addTo(map)
-            } 
+                bbd.forEach(observation => {
+                            L.marker([observation.lat, observation.lng]).bindPopup("Species: "+observation.comName+"<br>Date: "+observation.obsDt.toString().slice(4,6)+"/"+observation.obsDt.toString().slice(6,8)+"/"+observation.obsDt.toString().slice(0,4)+`</br>Location: `+observation.locName+`</br>Bird Info: <a target='_blank' href='https://ebird.org/species/` + observation.speciesCode +`'>More Info</a>`).addTo(layer);
+                        })
+                        layer.addTo(map)
+            } else {
+                var bbd = birdData.filter(function (el){
+                return el.obsDt <= tempDateInt
+                })
+                if(bbd.length > 0) {
+                    var monthQuarters = Math.max(...datesObjArr.map(o => o.id))/4
+                    birdDate.textContent = tempDateTxt;
+
+                    bbd.forEach(observation => {
+                        if (observation.dateIndex < monthQuarters) {
+                            symbology = first
+                        } else if (observation.dateIndex >= monthQuarters && observation.dateIndex < monthQuarters*2) {
+                            symbology = second
+                        } else if (observation.dateIndex >= monthQuarters*2 && observation.dateIndex < monthQuarters*3) {
+                            symbology = third
+                        } else {
+                            symbology = fourth
+                        }
+                        L.circle([observation.lat, observation.lng], symbology).bindPopup("Date: "+observation.obsDt.toString().slice(4,6)+"/"+observation.obsDt.toString().slice(6,8)+"/"+observation.obsDt.toString().slice(0,4)+`</br>Location: `+observation.locName+`</br>Bird Info: <a target='_blank' href='https://ebird.org/species/${observation.speciesCode}'>More Info</a>`).addTo(layer);
+
+                    })
+                    layer.addTo(map)
+                } 
+            }   
         }
+
+        function mapme(bird) {
+            layer.clearLayers()
+            fullList.forEach(type => {
+                if (bird == type.comName) {
+                    specCode = type.speciesCode
+                }
+            })
+            console.log(specCode)
+            console.log(bird)
+            fetch(`https://api.ebird.org/v2/data/obs/US-OR-013/recent/${specCode}?back=30&r=US-OR-013,US-OR-031,US-OR-017&includeProvisional=true`, {
+                headers: {
+                "X-eBirdApiToken": apiKey,
+                },
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data)
+                    data.forEach(observation => {
+                            L.marker([observation.lat, observation.lng]).bindPopup("Species: "+observation.comName+"<br>Date: "+observation.obsDt.toString().slice(4,6)+"/"+observation.obsDt.toString().slice(6,8)+"/"+observation.obsDt.toString().slice(0,4)+`</br>Location: `+observation.locName+`</br>Bird Info: <a target='_blank' href='https://ebird.org/species/` + observation.speciesCode +`'>More Info</a>`).addTo(layer);
+                        })
+                })
+            
+            }
 
         function LocalNotables() {
             if (notables == "off") {
                 notables = "on"
+                symbType = 'marker'
                 birdDate.textContent = "Last 30 Days";
                 var fg = L.featureGroup();
                 fetch(`https://api.ebird.org/v2/data/obs/US-OR-013/recent/notable?back=30&r=US-OR-013,US-OR-031,US-OR-017`, {
@@ -739,11 +779,27 @@
                         observation.obsDt = currDate
                     });
 
-                    if (data.length > 1) {   
+                    if (data.length > 0) {
                         data.forEach(observation => {
+                            notableBirdList.push(observation.comName)  
                             dateObs.push(observation.obsDt)
                         })
-
+                        var birdListSet = new Set(notableBirdList)
+                        notableBirdList = []
+                        birdListSet.forEach(bird =>{
+                            notableBirdList.push(bird)
+                        })
+                        
+                        notableBirdList.forEach(bird => {
+                            var mydiv = document.getElementById("counts");
+                            var aTag = document.createElement('a');
+                            aTag.setAttribute('href',"#");
+                            aTag.setAttribute('onclick',"mapme(`" + bird + "`)");
+                            aTag.innerText = bird;
+                            var br = document.createElement('br');
+                            mydiv.appendChild(aTag);
+                            mydiv.appendChild(br);
+                        })
                         datesObjArr = []
                         dateArr = []
                         dateSet = new Set(dateObs)
@@ -766,26 +822,8 @@
                             datesObjArr.push(dateObj)
             
                         })
-                        
-                        var monthQuarters = Math.max(...datesObjArr.map(o => o.id))/4
 
                         data.forEach(observation => {
-                            var dtObj = datesObjArr.filter(function (el) {
-                                return el.dateInt == observation.obsDt
-                            });
-
-                            observation.dateIndex = dtObj[0].id
-
-                            if (observation.dateIndex < monthQuarters) {
-                                symbology = first
-                            } else if (observation.dateIndex >= monthQuarters && observation.dateIndex < monthQuarters*2) {
-                                symbology = second
-                            } else if (observation.dateIndex >= monthQuarters*2 && observation.dateIndex < monthQuarters*3) {
-                                symbology = third
-                            } else {
-                                symbology = fourth
-                            }
-
                             L.marker([observation.lat, observation.lng]).bindPopup("Species: "+observation.comName+"<br>Date: "+observation.obsDt.toString().slice(4,6)+"/"+observation.obsDt.toString().slice(6,8)+"/"+observation.obsDt.toString().slice(0,4)+`</br>Location: `+observation.locName+`</br>Bird Info: <a target='_blank' href='https://ebird.org/species/` + observation.speciesCode +`'>More Info</a>`).addTo(layer);
                             L.marker([observation.lat, observation.lng]).addTo(fg)
                         })
