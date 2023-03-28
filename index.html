@@ -46,7 +46,6 @@ crossorigin=""></script>
           <div id="date"></div>
         </div>
         <div id="countContainer">
-          <div id="notableList"></div>
           <div id="counts"></div>
         </div>
     </div>
@@ -469,33 +468,6 @@ crossorigin=""></script>
             } 
         }
 
-        function mapNotableSingle(bird) {
-            layer.clearLayers()
-            var fg = L.featureGroup();
-            fullList.forEach(type => {
-                if (bird == type.comName) {
-                    specCode = type.speciesCode
-                }
-            })
-            fetch(`https://api.ebird.org/v2/data/obs/US-OR-013/recent/${specCode}?back=30&r=US-OR-013,US-OR-031,US-OR-017&includeProvisional=true`, {
-                headers: {
-                "X-eBirdApiToken": apiKey,
-                },
-                })
-                .then(response => response.json())
-                .then(data => {
-                    data.forEach(observation => {
-                      var currDateParts = observation.obsDt.substring(0,10).split('-')
-                      var currDate = Number(currDateParts[0]+currDateParts[1]+currDateParts[2])
-                      observation.obsDt = currDate
-                      L.marker([observation.lat, observation.lng]).addTo(fg)
-                      L.marker([observation.lat, observation.lng]).bindPopup("Species: "+observation.comName+"<br>Date: "+observation.obsDt.toString().slice(4,6)+"/"+observation.obsDt.toString().slice(6,8)+"/"+observation.obsDt.toString().slice(0,4)+`</br>Location: `+observation.locName+`</br>Bird Info: <a target='_blank' href='https://ebird.org/species/` + observation.speciesCode +`'>More Info</a>`).addTo(layer);
-                    })
-                    map.fitBounds(fg.getBounds(), {maxZoom: 14});
-                })            
-            }
-
-
 
         function LocalNotables() {
             if (notables == "off") {
@@ -588,6 +560,20 @@ crossorigin=""></script>
                 map.setView([40.8, -119.5], 4)
                 document.getElementById("counts").textContent = ''
             }
+        }
+
+
+        function mapNotableSingle(bird) {
+            console.log(birdData)
+            layer.clearLayers()
+            var fg = L.featureGroup();
+            birdData.forEach(observation => {
+              if (observation.comName == bird) {
+                L.marker([observation.lat, observation.lng]).addTo(fg)
+                L.marker([observation.lat, observation.lng]).bindPopup("Species: "+observation.comName+"<br>Date: "+observation.obsDt.toString().slice(4,6)+"/"+observation.obsDt.toString().slice(6,8)+"/"+observation.obsDt.toString().slice(0,4)+`</br>Location: `+observation.locName+`</br>Bird Info: <a target='_blank' href='https://ebird.org/species/` + observation.speciesCode +`'>More Info</a>`).addTo(layer);
+              }
+            })
+            map.fitBounds(fg.getBounds(), {maxZoom: 14});
         }
     </script>
 </body>
