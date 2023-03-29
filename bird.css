@@ -121,6 +121,22 @@ a {
         margin-right: 30px;
         margin-top: 20px;           
     }
+    #deschutesBox {
+        position: absolute;
+        top: 0;
+        right: 0;
+        z-index: 10;
+        margin-right: 30px;
+        margin-top: 60px;
+    }
+    #crookBox {
+        position: absolute;
+        top: 0;
+        right: 0;
+        z-index: 10;
+        margin-right: 30px;
+        margin-top: 100px;
+    }
     .button-Notables {
         align-items: center;
         appearance: none;
@@ -133,13 +149,14 @@ a {
         cursor: pointer;
         display: inline-flex;
         font-family: -apple-system,system-ui,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-        height: 48px;
+        height: 36px;
+        width: 125px;
         justify-content: center;
         line-height: 1;
         list-style: none;
         overflow: hidden;
-        padding-left: 16px;
-        padding-right: 16px;
+        padding-left: 10px;
+        padding-right: 10px;
         position: relative;
         text-align: left;
         text-decoration: none;
@@ -149,7 +166,8 @@ a {
         touch-action: manipulation;
         white-space: nowrap;
         will-change: box-shadow,transform;
-        font-size: 18px;
+        font-size: 14px;
+        font-weight: 700;
         }
 
     .button-Notables:focus {
@@ -292,6 +310,22 @@ a {
         margin-right: 30px;
         margin-top: 20px;           
     }
+    #deschutesBox {
+        position: absolute;
+        top: 0;
+        right: 0;
+        z-index: 10;
+        margin-right: 30px;
+        margin-top: 55px;
+    }
+    #crookBox {
+        position: absolute;
+        top: 0;
+        right: 0;
+        z-index: 10;
+        margin-right: 30px;
+        margin-top: 90px;
+    }
     .button-Notables {
         align-items: center;
         appearance: none;
@@ -304,7 +338,8 @@ a {
         cursor: pointer;
         display: inline-flex;
         font-family: -apple-system,system-ui,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-        height: 36px;
+        height: 30px;
+        width: 110px;
         justify-content: center;
         line-height: 1;
         list-style: none;
@@ -320,7 +355,8 @@ a {
         touch-action: manipulation;
         white-space: nowrap;
         will-change: box-shadow,transform;
-        font-size: 14px;
+        font-size: 12px;
+        font-weight: 700;
         }
 
     .button-Notables:focus {
