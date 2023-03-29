@@ -31,6 +31,9 @@ crossorigin=""></script>
         <div id="crookBox">
             <button class="button-Notables" role="button" onclick="crookBirdsfnc()">crook birds</button>
         </div>
+        <div id="nearMeBox">
+            <button class="button-Notables" role="button" onclick="nearMefnc()">near me</button>
+        </div>
     </div>
     <div id = "selectors">
         <div class="title desktop">Migration Tracker</div>
@@ -765,6 +768,20 @@ crossorigin=""></script>
                         
                         })
             
+        }
+
+
+        function nearMefnc() {
+            if (navigator.geolocation) {
+                navigator.geolocation.watchPosition(showPosition);
+            } else {
+                x.innerHTML = "Geolocation is not supported by this browser.";
+            }
+        }
+
+        function showPosition(position) {
+            map.setView([position.coords.latitude, position.coords.longitude], 12)
+            L.marker([position.coords.latitude, position.coords.longitude]).addTo(map)
         }
     </script>
 </body>
