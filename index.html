@@ -220,6 +220,7 @@ crossorigin=""></script>
 
 
         function mapBirds(comName) {
+            layerMe.clearLayers()
             document.getElementById("sliderContainer").style.display = "block";
             siteCount = 0
             totalCount = 0
@@ -488,6 +489,7 @@ crossorigin=""></script>
 
 
         function LocalNotables() {
+            layerMe.clearLayers()
             document.getElementById("sliderContainer").style.display = "block";
             if (notables == "off") {
                 document.getElementById("legend").style.display = "none";
@@ -497,6 +499,7 @@ crossorigin=""></script>
                 notables = "on"
                 desBirds = 'off'
                 crookBirds = 'off'
+                nearMeBrids = 'off'
                 symbType = 'marker'
                 birdDate.textContent = "Last 30 Days";
                 var fg = L.featureGroup();
@@ -601,6 +604,7 @@ crossorigin=""></script>
 
         function crookBirdsfnc() {
             document.getElementById("sliderContainer").style.display = "none";
+            layerMe.clearLayers()
             if (crookBirds == "off") {
                 map.setView([44.1526, -120.3889], 9)
                 document.getElementById("legend").style.display = "none";
@@ -688,6 +692,7 @@ crossorigin=""></script>
 
 
         function desBirdsfnc() {
+            layerMe.clearLayers()
             document.getElementById("sliderContainer").style.display = "none";
             if (desBirds == "off") {
                 map.setView([44.001911, -121.5098826], 9)
@@ -792,12 +797,19 @@ crossorigin=""></script>
                 opacity: 1.0,
                 fillColor: 'green',
                 fillOpacity: 0.3,
+                radius: 500
+            }).addTo(layerMe)
+            L.circle([lat, lng], {
+                color: 'black',
+                opacity: 1.0,
+                fillColor: 'black',
+                fillOpacity: 1.0,
                 radius: 50
             }).addTo(layerMe)
             layerMe.addTo(map)
 
             document.getElementById("sliderContainer").style.display = "block";
-            if (notables == "off") {
+            if (nearMeBirds == "off") {
                 document.getElementById("legend").style.display = "none";
                 document.getElementById("counts").textContent = ''
                 datesObjArr = []
@@ -876,8 +888,6 @@ crossorigin=""></script>
                         })
                         layer.addTo(map)
                         map.fitBounds(fg.getBounds());
-
-                        console.log(datesObjArr)
                         document.getElementById("dateRange").max = datesObjArr.length;
                         document.getElementById("dateRange").min = 1;
                         document.getElementById("dateRange").value = datesObjArr.length;
