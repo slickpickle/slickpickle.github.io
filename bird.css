@@ -137,6 +137,14 @@ a {
         margin-right: 30px;
         margin-top: 100px;
     }
+    #nearMeBox {
+        position: absolute;
+        top: 0;
+        right: 0;
+        z-index: 10;
+        margin-right: 30px;
+        margin-top: 140px;
+    }
     .button-Notables {
         align-items: center;
         appearance: none;
@@ -325,6 +333,14 @@ a {
         z-index: 10;
         margin-right: 10px;
         margin-top: 80px;
+    }
+    #nearMeBox {
+        position: absolute;
+        top: 0;
+        right: 0;
+        z-index: 10;
+        margin-right: 10px;
+        margin-top: 115px;
     }
     .button-Notables {
         align-items: center;
