@@ -89,6 +89,7 @@ crossorigin=""></script>
         var birdData
         var layer = L.layerGroup()
         var layerMe = L.layerGroup()
+        var layerMass = L.layerGroup()
         var dateObs = []
         var birdDate = document.getElementById("date");
         var siteCount
@@ -463,13 +464,19 @@ crossorigin=""></script>
                 } 
             } else {
                 var bbd = birdData.filter(function (el){
-                return el.obsDt <= tempDateInt
+                    return el.obsDt <= tempDateInt
                 })
                 if(bbd.length > 0) {
                     var monthQuarters = Math.max(...datesObjArr.map(o => o.id))/4
                     birdDate.textContent = tempDateTxt;
-
+                    bbdLat =[]
+                    bbdLng = []
+                    var latMean
+                    var lngMean
                     bbd.forEach(observation => {
+                        bbdLat.push(observation.lat)
+                        bbdLng.push(observation.lng)
+
                         if (observation.dateIndex < monthQuarters) {
                             symbology = first
                         } else if (observation.dateIndex >= monthQuarters && observation.dateIndex < monthQuarters*2) {
@@ -482,6 +489,27 @@ crossorigin=""></script>
                         L.circle([observation.lat, observation.lng], symbology).bindPopup("Date: "+observation.obsDt.toString().slice(4,6)+"/"+observation.obsDt.toString().slice(6,8)+"/"+observation.obsDt.toString().slice(0,4)+`</br>Location: `+observation.locName+`</br>Bird Info: <a target='_blank' href='https://ebird.org/species/${observation.speciesCode}'>More Info</a>`).addTo(layer);
 
                     })
+                    var totalLat = 0;
+                    var totalLng = 0;
+                    for(var i = 0; i < bbdLat.length; i++) {
+                        totalLat += bbdLat[i];
+                        totalLng += bbdLng[i];
+                    }
+                    latMean = totalLat / bbdLat.length;
+                    lngMean = totalLng / bbdLng.length;
+
+
+
+                    layerMass.clearLayers()
+                    L.circle([latMean, lngMean], {
+                        color: 'black',
+                        opacity: 0.0,
+                        fillColor: 'black',
+                        fillOpacity: .2,
+                        radius: 100000
+                    }).addTo(layerMass)
+
+                    layerMass.addTo(map)
                     layer.addTo(map)
                 } 
             } 
@@ -544,15 +572,11 @@ crossorigin=""></script>
                         
                         dateArr = []
                         dateSet = new Set(dateObs)
-
                         dateSet.forEach(date =>{
                             dateArr.push(date)
                         })
-
                         dateArr.sort()
-
                         var d =0
-
                         dateArr.forEach(date => {
                             d=d+1
                             var dateObj = {
@@ -561,7 +585,6 @@ crossorigin=""></script>
                                 "dateTxt": date.toString().slice(4,6)+"/"+date.toString().slice(6,8)+"/"+date.toString().slice(0,4)
                             }
                             datesObjArr.push(dateObj)
-            
                         })
 
                         data.forEach(observation => {
@@ -587,7 +610,6 @@ crossorigin=""></script>
             }
         }
 
-
         function mapNotableSingle(bird) {
             layer.clearLayers()
             var fg = L.featureGroup();
@@ -599,8 +621,6 @@ crossorigin=""></script>
             })
             map.fitBounds(fg.getBounds(), {maxZoom: 14});
         }
-
-
 
         function crookBirdsfnc() {
             document.getElementById("sliderContainer").style.display = "none";
@@ -690,7 +710,6 @@ crossorigin=""></script>
             
         }
 
-
         function desBirdsfnc() {
             layerMe.clearLayers()
             document.getElementById("sliderContainer").style.display = "none";
@@ -777,7 +796,6 @@ crossorigin=""></script>
                         })
             
         }
-
 
         function nearMefnc() {
             if (navigator.geolocation) {
@@ -904,7 +922,6 @@ crossorigin=""></script>
                 document.getElementById("counts").textContent = ''
             }
         }
-
 
         function mapNearMeSingle(bird) {
             layer.clearLayers()
