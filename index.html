@@ -849,7 +849,14 @@ crossorigin=""></script>
                     data.sort((a, b) => a.obsDt.localeCompare(b.obsDt));
                     birdData = data
                     layer.clearLayers()
+
                     data.forEach(observation => {
+                        var OrRecObj = {
+                            "comName": observation.comName,
+                            "speciesCode": observation.speciesCode
+                        }
+                        oregonRecentData.push(OrRecObj)
+                        fullList.push(OrRecObj) 
                         var currDateParts = observation.obsDt.substring(0,10).split('-')
                         var currDate = Number(currDateParts[0]+currDateParts[1]+currDateParts[2])
                         observation.obsDt = currDate
