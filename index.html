@@ -174,15 +174,12 @@ crossorigin=""></script>
         }
         
         function onMapClick(e) {
-            
-            layer.clearLayers()
             if(click == true) {
                 click = false
                 document.getElementById("map").style.cursor = "default";
                 lat = e.latlng.lat
                 lng = e.latlng.lng
                 layerMe.clearLayers()
-                var fg = L.featureGroup();
                 L.circle([lat, lng], {
                     color: 'green',
                     opacity: 1.0,
@@ -205,7 +202,6 @@ crossorigin=""></script>
                     radius: 20000
                 }).addTo(layerMe)
                 layerMe.addTo(map)
-
                 document.getElementById("sliderContainer").style.display = "block";
                 if (nearMeBirds == "off") {
                     document.getElementById("legend").style.display = "none";
@@ -243,6 +239,7 @@ crossorigin=""></script>
                         });
 
                         if (data.length > 0) {
+                            notableBirdList = []
                             data.forEach(observation => {
                                 notableBirdList.push(observation.comName)  
                                 dateObs.push(observation.obsDt)
@@ -253,6 +250,7 @@ crossorigin=""></script>
                                 notableBirdList.push(bird)
                             })
                             notableBirdList.sort()
+                            console.log(birdListSet.size)
                             notableBirdList.forEach(bird => {
                                 var countDiv = document.getElementById("counts");
                                 var buttonDiv = document.createElement('div');
@@ -289,7 +287,7 @@ crossorigin=""></script>
 
                             data.forEach(observation => {
                                 L.marker([observation.lat, observation.lng]).bindPopup("Species: "+observation.comName+"<br>Date: "+observation.obsDt.toString().slice(4,6)+"/"+observation.obsDt.toString().slice(6,8)+"/"+observation.obsDt.toString().slice(0,4)+`</br>Location: `+observation.locName+`</br>Bird Info: <a target='_blank' href='https://ebird.org/species/` + observation.speciesCode +`'>More Info</a>`).addTo(layer);
-                                L.marker([observation.lat, observation.lng]).addTo(fg)
+
                             })
                             layer.addTo(map)
                             map.flyTo(e.latlng,10);
@@ -951,6 +949,7 @@ crossorigin=""></script>
 
         function nearMefnc() {
             if (navigator.geolocation) {
+                nearMeBirds = "off"
                 navigator.geolocation.getCurrentPosition(showPosition);
             } else {
                 console.log("Geolocation is not supported by this browser.")
@@ -1015,6 +1014,7 @@ crossorigin=""></script>
                     });
 
                     if (data.length > 0) {
+                        notableBirdList = []
                         data.forEach(observation => {
                             notableBirdList.push(observation.comName)  
                             dateObs.push(observation.obsDt)
@@ -1097,9 +1097,11 @@ crossorigin=""></script>
                         })
                         .then(response => response.json())
                         .then(data => {
+                            birdData = data
                             data.forEach(observation => {
                                 var currDateParts = observation.obsDt.substring(0,10).split('-')
                                 var currDate = Number(currDateParts[0]+currDateParts[1]+currDateParts[2])
+                                console.log(observation)
                                 observation.obsDt = currDate
                                 L.marker([observation.lat, observation.lng]).bindPopup("Species: "+observation.comName+"<br>Date: "+observation.obsDt.toString().slice(4,6)+"/"+observation.obsDt.toString().slice(6,8)+"/"+observation.obsDt.toString().slice(0,4)+`</br>Location: `+observation.locName+`</br>Bird Info: <a target='_blank' href='https://ebird.org/species/` + observation.speciesCode +`'>More Info</a>`).addTo(layer);
                                 L.marker([observation.lat, observation.lng]).addTo(fg)
@@ -1107,6 +1109,7 @@ crossorigin=""></script>
                             });
 
                             layer.addTo(map)
+                            console.log(fg)
                             map.fitBounds(fg.getBounds(), {maxZoom: 14});
                         
                         })
