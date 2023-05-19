@@ -34,6 +34,9 @@ crossorigin=""></script>
         <div id="nearMeBox">
             <button class="button-Notables" role="button" onclick="nearMefnc()">near me</button>
         </div>
+        <div id="customPointBox">
+            <button class="button-Notables" role="button" onclick="customPointfnc()">click map</button>
+        </div>
     </div>
     <div id = "selectors">
         <div class="title desktop">Migration Tracker</div>
@@ -157,8 +160,157 @@ crossorigin=""></script>
             radius: 50000
         }
 
+        var popup = L.popup();
+        var click = false
 
+        map.on('click', onMapClick);
+        
+        function customPointfnc() {
+            document.getElementById("map").style.cursor = "crosshair";
+            click = true
+            layer.clearLayers()
+            layerMe.clearLayers()
+            nearMeBirds = "off"
+        }
+        
+        function onMapClick(e) {
+            
+            layer.clearLayers()
+            if(click == true) {
+                click = false
+                document.getElementById("map").style.cursor = "default";
+                lat = e.latlng.lat
+                lng = e.latlng.lng
+                layerMe.clearLayers()
+                var fg = L.featureGroup();
+                L.circle([lat, lng], {
+                    color: 'green',
+                    opacity: 1.0,
+                    fillColor: 'green',
+                    fillOpacity: 1.0,
+                    radius: 500
+                }).addTo(layerMe)
+                L.circle([lat, lng], {
+                    color: 'black',
+                    opacity: .3,
+                    fillColor: 'black',
+                    fillOpacity: 1.0,
+                    radius: 50
+                }).addTo(layerMe)
+                L.circle([lat, lng], {
+                    color: 'black',
+                    opacity: 1,
+                    fillColor: 'black',
+                    fillOpacity: 0,
+                    radius: 20000
+                }).addTo(layerMe)
+                layerMe.addTo(map)
 
+                document.getElementById("sliderContainer").style.display = "block";
+                if (nearMeBirds == "off") {
+                    document.getElementById("legend").style.display = "none";
+                    document.getElementById("counts").textContent = ''
+                    datesObjArr = []
+                    dateObs = []
+                    nearMeBirds = "on"
+                    notables = "off"
+                    desBirds = 'off'
+                    crookBirds = 'off'
+                    symbType = 'marker'
+                    birdDate.textContent = "Last 30 Days";
+
+                    fetch(`https://api.ebird.org/v2/data/obs/geo/recent?lat=${lat}&lng=${lng}&back=30&dist=20`, {
+                            headers: {
+                            "X-eBirdApiToken": apiKey,
+                            },
+                            })
+                            .then(response => response.json())
+                            .then(data => {
+                        data.sort((a, b) => a.obsDt.localeCompare(b.obsDt));
+                        birdData = data
+                        layer.clearLayers()
+
+                        data.forEach(observation => {
+                            var OrRecObj = {
+                                "comName": observation.comName,
+                                "speciesCode": observation.speciesCode
+                            }
+                            oregonRecentData.push(OrRecObj)
+                            fullList.push(OrRecObj) 
+                            var currDateParts = observation.obsDt.substring(0,10).split('-')
+                            var currDate = Number(currDateParts[0]+currDateParts[1]+currDateParts[2])
+                            observation.obsDt = currDate
+                        });
+
+                        if (data.length > 0) {
+                            data.forEach(observation => {
+                                notableBirdList.push(observation.comName)  
+                                dateObs.push(observation.obsDt)
+                            })
+                            var birdListSet = new Set(notableBirdList)
+                            notableBirdList = []
+                            birdListSet.forEach(bird =>{
+                                notableBirdList.push(bird)
+                            })
+                            notableBirdList.sort()
+                            notableBirdList.forEach(bird => {
+                                var countDiv = document.getElementById("counts");
+                                var buttonDiv = document.createElement('div');
+                                buttonDiv.setAttribute('class',"notableListButton")
+                                var aTag = document.createElement('a');
+                                aTag.setAttribute('href',"#");
+                                aTag.setAttribute('onclick',"mapNearMeSingle(`" + bird + "`)");
+                                buttonDiv.innerText = bird;
+                                countDiv.appendChild(aTag);
+                                aTag.appendChild(buttonDiv)
+                            })
+                            
+                            dateArr = []
+                            dateSet = new Set(dateObs)
+
+                            dateSet.forEach(date =>{
+                                dateArr.push(date)
+                            })
+
+                            dateArr.sort()
+
+                            var d =0
+
+                            dateArr.forEach(date => {
+                                d=d+1
+                                var dateObj = {
+                                    "id": d,
+                                    "dateInt": date,
+                                    "dateTxt": date.toString().slice(4,6)+"/"+date.toString().slice(6,8)+"/"+date.toString().slice(0,4)
+                                }
+                                datesObjArr.push(dateObj)
+                
+                            })
+
+                            data.forEach(observation => {
+                                L.marker([observation.lat, observation.lng]).bindPopup("Species: "+observation.comName+"<br>Date: "+observation.obsDt.toString().slice(4,6)+"/"+observation.obsDt.toString().slice(6,8)+"/"+observation.obsDt.toString().slice(0,4)+`</br>Location: `+observation.locName+`</br>Bird Info: <a target='_blank' href='https://ebird.org/species/` + observation.speciesCode +`'>More Info</a>`).addTo(layer);
+                                L.marker([observation.lat, observation.lng]).addTo(fg)
+                            })
+                            layer.addTo(map)
+                            map.flyTo(e.latlng,10);
+                            document.getElementById("dateRange").max = datesObjArr.length;
+                            document.getElementById("dateRange").min = 1;
+                            document.getElementById("dateRange").value = datesObjArr.length;
+                        } else {
+                            console.log("no data")
+                        }
+
+                    })
+
+                } else {
+                    nearMeBirds = "off"
+                    layer.clearLayers()
+                    map.setView([40.8, -119.5], 4)
+                    document.getElementById("counts").textContent = ''
+                }
+            }   
+        }
+        
 
 
         fetch(enpointOregonRecent, {
