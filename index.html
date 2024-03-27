@@ -29,7 +29,7 @@
                 <button class="birdButton" @click="selectDropdown(bird)">{{ bird.comName }}</button>
             </div>
         </div>
-        <input type="range" v-model="sliderValue" min="0" max="30" id="dateSlider">
+        <input type="range" v-model="sliderValue" min="0" max="30" class="dateSlider">
         <div id="map" ref="mapContainer"></div>
     </div>
     <div v-show="coverScreen" class="cover-screen">Fetching data...</div>
@@ -71,12 +71,17 @@
       z-index: 1010; /* Ensure it's above other content */
       font-family: Arial, Helvetica, sans-serif;
     }
-    #dateSlider{
+    .dateSlider{
       position: absolute;
       left: 60px;
       bottom: 40px;
       z-index: 1000;
       width: 200px;
+    }
+    @media (max-width:700px){
+      .dateSlider {
+        bottom: 100px;
+      }
     }
     .birdList {
       position: absolute;
