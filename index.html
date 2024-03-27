@@ -30,7 +30,7 @@
             </div>
         </div>
         <input type="range" v-model="sliderValue" min="0" max="30" id="dateSlider">
-        <!-- <div id="map" ref="mapContainer"></div> -->
+        <div id="map" ref="mapContainer"></div>
     </div>
     <div v-show="coverScreen" class="cover-screen">Fetching data...</div>
     <div v-show="showNoDataMessage" class="no-data-message">No recent sightings</div> 
@@ -233,7 +233,7 @@
       mounted() {
         // Call the API when the component is mounted
         this.fetchData();
-        this.map = L.map(this.$refs.mapContainer).setView([40.8, -119.5], 4);
+        this.map = L.map(this.$refs.mapContainer).setView([40.8, -119.5], 5);
         
         // Add a tile layer
         L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager_labels_under/{z}/{x}/{y}{r}.png', {
