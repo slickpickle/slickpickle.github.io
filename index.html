@@ -13,7 +13,7 @@
     <div id="app">
       <div class="mapWrapper">
         <div class="search-container">
-            <input class="searchBar" type="text" v-model="searchQuery" placeholder="Search a bird" @focus="showOptions = true" @blur="hideOptions">
+            <input class="searchBar" type="text" v-model="searchQuery" placeholder="Search a bird" @focus="showOptions = true" @blur="hideOptions" @keyup.enter="selectDropdown(item)">
             <button v-if="searchQuery" @click="clearSearch">X</button>
             <ul v-if="showOptions" class="options-list">
                 <li v-for="(item, index) in filteredList" :key="index" @click="selectDropdown(item)">{{ item.comName }}</li>
