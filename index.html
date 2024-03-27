@@ -13,7 +13,7 @@
     <div id="app">
       <div class="mapWrapper">
         <div class="search-container">
-            <input class="searchBar" type="text" v-model="searchQuery" placeholder="Search a bird" @focus="showOptions = true" @blur="hideOptions" @keyup.enter="selectDropdown(item)">
+            <input class="searchBar" type="text" v-model="searchQuery" :placeholder="searchPlaceholder" :disabled="isFetching" @focus="showOptions = true" @blur="hideOptions">
             <button v-if="searchQuery" @click="clearSearch">X</button>
             <ul v-if="showOptions" class="options-list">
                 <li v-for="(item, index) in filteredList" :key="index" @click="selectDropdown(item)">{{ item.comName }}</li>
@@ -29,7 +29,7 @@
                 <button class="birdButton" @click="selectDropdown(bird)">{{ bird.comName }}</button>
             </div>
         </div>
-        <input type="range" v-model="sliderValue" min="0" max="30" class="dateSlider">
+        <input type="range" v-model="sliderValue" min="0" max="30" class="dateSlider" v-show="isSliderVisible">
         <div id="map" ref="mapContainer"></div>
     </div>
     <div v-show="coverScreen" class="cover-screen">Fetching data...</div>
@@ -220,6 +220,9 @@
             showNoDataMessage: false,
             allObservations: [], // Store all fetched observations here
             sliderValue: 30,
+            searchPlaceholder: 'fetching bird list...',
+            isFetching: true,
+            isSliderVisible: false,
         };
       },
       watch: {
@@ -322,12 +325,15 @@
             });
     
             this.speciesArray = speciesArray
+            this.searchPlaceholder = 'Search a bird'
+            this.isFetching = false
           })
           .catch(error => {
             console.error('Error fetching OR data:', error);
           });
         },
         selectDropdown(item) {
+          this.birdNames = [];
           this.sliderValue= 30;
           this.coverScreen = true;
           this.markerGroup.clearLayers();
@@ -362,6 +368,11 @@
             
             if (this.markerGroup.getLayers().length > 0) {
               this.map.fitBounds(this.markerGroup.getBounds(), { padding: [10, 10] });
+            } else {
+              this.showNoDataMessage = true
+              setTimeout(() => {
+                this.showNoDataMessage = false;
+              }, 1500);
             }
             this.coverScreen = false;
           })
@@ -378,6 +389,7 @@
           }, 200);
         },
         selectLocalNotables(item) {
+          this.isSliderVisible = false;
             this.sliderValue = 30;
             const apiKey = "g0gbj09j2s1b";
             this.markerGroup.clearLayers();
@@ -423,7 +435,7 @@
                     this.markerGroup.addLayer(marker);
                 });
                 if (this.markerGroup.getLayers().length > 0) {
-                    this.map.fitBounds(this.markerGroup.getBounds(), { padding: [30, 30] }); // Adds padding around the bounds
+                    this.map.fitBounds(this.markerGroup.getBounds(), { padding: [30, 30] });
                 }
             })
             .catch(error => {
@@ -475,13 +487,16 @@
             });
         },
         clearSearch() {
+          this.birdNames = [];
           this.sliderValue = 30;
           this.searchQuery = ''; // Clear the search query
           this.markerGroup.clearLayers();
-          this.map.setView([40.8, -119.5], 4);
+          this.map.setView([40.8, -119.5], 5);
+          this.isSliderVisible = false;
           // Any other state resets related to clearing the search
         },
         updateMapMarkers() {
+          this.isSliderVisible = true;
           this.coverScreen = true; // Show loading indication
           this.markerGroup.clearLayers(); // Clear existing layers from the map
 
