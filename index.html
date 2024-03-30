@@ -21,7 +21,7 @@
         </div>
         <div class="buttonList">
             <button class="searchButton" @click="selectLocalNotables">local notables</button>
-            <button class="searchButton">near me</button>
+            <button class="searchButton" @click="selectNearMeAll">near me</button>
             <button class="searchButton">click map</button>
         </div>
         <div class="birdList">
@@ -389,7 +389,7 @@
           }, 200);
         },
         selectLocalNotables(item) {
-          this.isSliderVisible = false;
+            this.isSliderVisible = false;
             this.sliderValue = 30;
             const apiKey = "g0gbj09j2s1b";
             this.markerGroup.clearLayers();
@@ -441,6 +441,69 @@
             .catch(error => {
                 console.error('Error fetching data:', error);
             });
+        },
+        selectNearMeAll() {
+            this.coverScreen = true; // Show loading overlay
+            this.birdNames = []; // Reset bird names list
+            this.markerGroup.clearLayers(); // Clear existing markers
+
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(position => {
+                    const { latitude, longitude } = position.coords;
+
+                    // Construct the API URL with user's current latitude and longitude
+                    const apiUrl = `https://api.ebird.org/v2/data/obs/geo/recent?lat=${latitude}&lng=${longitude}`;
+                    const apiKey = "g0gbj09j2s1b"; // Replace with your actual API key
+
+                    fetch(apiUrl, {
+                        headers: { 'X-eBirdApiToken': apiKey }
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        let uniqueBirds = new Map();
+
+                        data.forEach(observation => {
+                            // Check if bird species is already in the list
+                            if (!uniqueBirds.has(observation.speciesCode)) {
+                                uniqueBirds.set(observation.speciesCode, {
+                                    comName: observation.comName,
+                                    speciesCode: observation.speciesCode
+                                });
+                            }
+
+                            // Create and add a marker for each observation
+                            const popupContent = `Species: ${observation.comName}<br>Date: ${observation.obsDt}<br>Location: ${observation.locName}`;
+                            const marker = L.marker([observation.lat, observation.lng]).bindPopup(popupContent);
+                            this.markerGroup.addLayer(marker);
+                        });
+
+                        // Populate birdNames with unique birds from observations
+                        this.birdNames = Array.from(uniqueBirds.values()).sort((a, b) => a.comName.localeCompare(b.comName));
+
+                        // Fit map bounds to markers
+                        if (this.markerGroup.getLayers().length > 0) {
+                            this.map.fitBounds(this.markerGroup.getBounds(), { padding: [30, 30] });
+                        }
+
+                        this.coverScreen = false; // Hide loading overlay
+                    })
+                    .catch(error => {
+                        console.error('Error fetching data:', error);
+                        this.coverScreen = false;
+                    });
+                }, error => {
+                    console.error('Error getting location:', error);
+                    this.coverScreen = false;
+                });
+            } else {
+                console.log("Geolocation is not supported by this browser.");
+                this.coverScreen = false;
+            }
         },
         onBirdNameClick(bird) {
           this.sliderValue=30;
