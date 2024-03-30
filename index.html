@@ -517,11 +517,6 @@
                         // Populate birdNames with unique birds from observations
                         this.birdNames = Array.from(uniqueBirds.values()).sort((a, b) => a.comName.localeCompare(b.comName));
 
-                        // Fit map bounds to markers
-                        if (this.markerGroup.getLayers().length > 0) {
-                            this.map.fitBounds(this.markerGroup.getBounds(), { padding: [30, 30] });
-                        }
-
                         this.coverScreen = false; // Hide loading overlay
                     })
                     .catch(error => {
