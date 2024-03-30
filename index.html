@@ -389,58 +389,76 @@
           }, 200);
         },
         selectLocalNotables(item) {
-            this.isSliderVisible = false;
-            this.sliderValue = 30;
-            const apiKey = "g0gbj09j2s1b";
-            this.markerGroup.clearLayers();
-            this.birdNames = []; // Clear existing bird names
-            this.showOptions = false; // Hide the options list
-            let uniqueBirds = new Map();
-            this.allObservations = [];
+            this.coverScreen = true; // Show loading overlay
+            this.birdNames = []; // Reset bird names list
+            this.markerGroup.clearLayers(); // Clear existing markers
 
-            // Define the API URL, inserting the selected species code dynamically
-            const apiUrl = `https://api.ebird.org/v2/data/obs/US-OR-013/recent/notable?back=30&r=US-OR-013,US-OR-031,US-OR-017`;
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(position => {
+                    const { latitude, longitude } = position.coords;
 
-            // Fetch data from the API
-            fetch(apiUrl, {
-                headers: {
-                'X-eBirdApiToken': apiKey
-                }
-            })
-            .then(response => {
-                if (!response.ok) {
-                throw new Error('Network response was not ok');
-                }
-                return response.json();
-            })
-            .then(data => {
-              data.forEach(observation => {
-                  // Use comName as key and check if it's not already in the Map
-                  if (!uniqueBirds.has(observation.comName)) {
-                      uniqueBirds.set(observation.comName, observation.speciesCode);
-                  }
-              });
-              this.birdNames = Array.from(uniqueBirds, ([comName, speciesCode]) => ({ comName, speciesCode }))
-                .sort((a, b) => a.comName.localeCompare(b.comName));
-                // Assuming 'data' is an array of observation objects
-                data.forEach(observation => {
-                    const obsDate = new Date(observation.obsDt);
-                    const dateOptions = { year: 'numeric', month: '2-digit', day: '2-digit' };
-                    const formattedDate = obsDate.toLocaleDateString('en-US', dateOptions);
-                    const timeOptions = { hour: '2-digit', minute: '2-digit', hour12: true };
-                    const formattedTime = obsDate.toLocaleTimeString('en-US', timeOptions);
-                    const popupContent = `Species: ${observation.comName}<br>Date: ${formattedDate} ${formattedTime}</br>Location: ${observation.locName}</br>Bird Info: <a target='_blank' href='https://ebird.org/species/${observation.speciesCode}'>More Info</a>`;
+                    // Define the search radius (in meters) for the circle
+                    const searchRadius = 50000; // 50 km
 
-                    const marker = L.marker([observation.lat, observation.lng]).bindPopup(popupContent);
-                    this.markerGroup.addLayer(marker);
+                    // Add a circle to show the search buffer area
+                    const searchBufferCircle = L.circle([latitude, longitude], {
+                        radius: searchRadius,
+                        color: 'blue', // Circle border color
+                        opacity: .2,
+                        fillOpacity: 0 // Circle fill opacity
+                    }).addTo(this.map);
+
+                    // Fit map bounds to the circle's bounds
+                    this.map.fitBounds(searchBufferCircle.getBounds());
+
+                    // Construct the API URL with user's current latitude and longitude
+                    const apiUrl = `https://api.ebird.org/v2/data/obs/geo/recent/notable?lat=${latitude}&lng=${longitude}&back=30&dist=50`;
+                    const apiKey = "g0gbj09j2s1b"; // Replace with your actual API key
+
+                    fetch(apiUrl, {
+                        headers: { 'X-eBirdApiToken': apiKey }
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        let uniqueBirds = new Map();
+
+                        data.forEach(observation => {
+                            // Check if bird species is already in the list
+                            if (!uniqueBirds.has(observation.speciesCode)) {
+                                uniqueBirds.set(observation.speciesCode, {
+                                    comName: observation.comName,
+                                    speciesCode: observation.speciesCode
+                                });
+                            }
+
+                            // Create and add a marker for each observation
+                            const popupContent = `Species: ${observation.comName}<br>Date: ${observation.obsDt}<br>Location: ${observation.locName}`;
+                            const marker = L.marker([observation.lat, observation.lng]).bindPopup(popupContent);
+                            this.markerGroup.addLayer(marker);
+                        });
+
+                        // Populate birdNames with unique birds from observations
+                        this.birdNames = Array.from(uniqueBirds.values()).sort((a, b) => a.comName.localeCompare(b.comName));
+
+                        this.coverScreen = false; // Hide loading overlay
+                    })
+                    .catch(error => {
+                        console.error('Error fetching data:', error);
+                        this.coverScreen = false;
+                    });
+                }, error => {
+                    console.error('Error getting location:', error);
+                    this.coverScreen = false;
                 });
-                if (this.markerGroup.getLayers().length > 0) {
-                    this.map.fitBounds(this.markerGroup.getBounds(), { padding: [30, 30] });
-                }
-            })
-            .catch(error => {
-                console.error('Error fetching data:', error);
-            });
+            } else {
+                console.log("Geolocation is not supported by this browser.");
+                this.coverScreen = false;
+            }
         },
         selectNearMeAll() {
             this.coverScreen = true; // Show loading overlay
@@ -451,8 +469,22 @@
                 navigator.geolocation.getCurrentPosition(position => {
                     const { latitude, longitude } = position.coords;
 
+                    // Define the search radius (in meters) for the circle
+                    const searchRadius = 50000; // 50 km
+
+                    // Add a circle to show the search buffer area
+                    const searchBufferCircle = L.circle([latitude, longitude], {
+                        radius: searchRadius,
+                        color: 'blue', // Circle border color
+                        opacity: .2,
+                        fillOpacity: 0 // Circle fill opacity
+                    }).addTo(this.map);
+
+                    // Fit map bounds to the circle's bounds
+                    this.map.fitBounds(searchBufferCircle.getBounds());
+
                     // Construct the API URL with user's current latitude and longitude
-                    const apiUrl = `https://api.ebird.org/v2/data/obs/geo/recent?lat=${latitude}&lng=${longitude}`;
+                    const apiUrl = `https://api.ebird.org/v2/data/obs/geo/recent?lat=${latitude}&lng=${longitude}&back=30&dist=50`;
                     const apiKey = "g0gbj09j2s1b"; // Replace with your actual API key
 
                     fetch(apiUrl, {
