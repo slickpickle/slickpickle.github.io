@@ -22,7 +22,7 @@
         <div class="buttonList">
             <button class="searchButton" @click="selectLocalNotables">local notables</button>
             <button class="searchButton" @click="selectNearMeAll">near me</button>
-            <button class="searchButton">click map</button>
+            <button class="searchButton" @click="enableMapClick">click map</button>
         </div>
         <div class="birdList">
             <div v-for="bird in birdNames" :key="bird.speciesCode">
@@ -223,6 +223,8 @@
             searchPlaceholder: 'fetching bird list...',
             isFetching: true,
             isSliderVisible: false,
+            handleMapClick: false,
+            selectionCircle: null,
         };
       },
       watch: {
@@ -251,6 +253,7 @@
           maxZoom: 20
         }).addTo(this.map);
         this.markerGroup = L.featureGroup().addTo(this.map);
+        this.map.on('click', this.mapClickHandler);
       },
       methods: {
         fetchData() {
@@ -576,6 +579,97 @@
                 console.error('Error fetching data:', error);
             });
         },
+        selectFromMap(latitude, longitude) { 
+          this.coverScreen = true; // Show loading overlay
+            this.birdNames = []; // Reset bird names list
+            this.markerGroup.clearLayers(); // Clear existing markers
+
+            // Define the search radius for the circle (in meters)
+            const searchRadius = 50000; // 50 km
+
+            // Add a circle to show the search buffer area
+            this.selectionCircle = L.circle([latitude, longitude], {
+                radius: searchRadius,
+                color: 'blue', // Circle border color
+                opacity: .2,
+                fillOpacity: 0, // Circle fill opacity
+            }).addTo(this.map);
+
+            // Fit map bounds to the circle's bounds
+            this.map.fitBounds(this.selectionCircle.getBounds());
+
+            // Construct the API URL with clicked location's latitude and longitude
+            const apiUrl = `https://api.ebird.org/v2/data/obs/geo/recent?lat=${latitude}&lng=${longitude}&back=30&dist=50`;
+            const apiKey = "g0gbj09j2s1b"; // Use your actual API key
+
+            fetch(apiUrl, {
+                headers: { 'X-eBirdApiToken': apiKey }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                let uniqueBirds = new Map();
+
+                data.forEach(observation => {
+                    // Check if bird species is already in the list
+                    if (!uniqueBirds.has(observation.speciesCode)) {
+                        uniqueBirds.set(observation.speciesCode, {
+                            comName: observation.comName,
+                            speciesCode: observation.speciesCode
+                        });
+                    }
+
+                    // Create and add a marker for each observation
+                    const popupContent = `Species: ${observation.comName}<br>Date: ${observation.obsDt}<br>Location: ${observation.locName}`;
+                    const marker = L.marker([observation.lat, observation.lng]).bindPopup(popupContent);
+                    this.markerGroup.addLayer(marker);
+                });
+
+                // Populate birdNames with unique birds from observations
+                this.birdNames = Array.from(uniqueBirds.values()).sort((a, b) => a.comName.localeCompare(b.comName));
+
+                this.coverScreen = false; // Hide loading overlay
+            })
+            .catch(error => {
+                console.error('Error fetching data:', error);
+                this.coverScreen = false;
+            });
+        },
+        enableMapClick() {
+            // Always set handleMapClick to true when the button is clicked
+            this.handleMapClick = true;
+
+            // Change the cursor to a crosshair to indicate clickable mode
+            this.map.getContainer().style.cursor = 'crosshair';
+
+            // Remove the selection circle if it exists
+            if (this.selectionCircle) {
+                this.map.removeLayer(this.selectionCircle);
+                this.selectionCircle = null;
+            }
+
+            // Clear existing markers
+            this.markerGroup.clearLayers();
+        },
+
+        mapClickHandler(e) {
+            // Only proceed if handleMapClick is true
+            if (!this.handleMapClick) return;
+
+            const { lat, lng } = e.latlng;
+            this.selectFromMap(lat, lng);
+
+            // Reset handleMapClick to false to prevent additional selections until the button is clicked again
+            this.handleMapClick = false;
+
+            // Change the cursor back to default after a selection is made
+            this.map.getContainer().style.cursor = '';
+        },
+
         clearSearch() {
           this.birdNames = [];
           this.sliderValue = 30;
