@@ -346,6 +346,11 @@
           this.showOptions = false; // Hide the options list
           this.allObservations = []; // Clear previous observations
 
+          if (this.selectionCircle) {
+                this.map.removeLayer(this.selectionCircle);
+                this.selectionCircle = null;
+            }
+
           const apiKey = "g0gbj09j2s1b";
           // Define the API URL, inserting the selected species code dynamically
           const apiUrl = `https://api.ebird.org/v2/data/obs/US-OR/recent/${this.selectedSpeciesCode}?back=30&r=US-ID,US-CA,US-NV,US-WA,US-OR`;
@@ -396,6 +401,11 @@
             this.birdNames = []; // Reset bird names list
             this.markerGroup.clearLayers(); // Clear existing markers
 
+            if (this.selectionCircle) {
+                this.map.removeLayer(this.selectionCircle);
+                this.selectionCircle = null;
+            }
+
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(position => {
                     const { latitude, longitude } = position.coords;
@@ -404,7 +414,7 @@
                     const searchRadius = 50000; // 50 km
 
                     // Add a circle to show the search buffer area
-                    const searchBufferCircle = L.circle([latitude, longitude], {
+                    this.selectionCircle = L.circle([latitude, longitude], {
                         radius: searchRadius,
                         color: 'blue', // Circle border color
                         opacity: .2,
@@ -412,7 +422,7 @@
                     }).addTo(this.map);
 
                     // Fit map bounds to the circle's bounds
-                    this.map.fitBounds(searchBufferCircle.getBounds());
+                    this.map.fitBounds(this.selectionCircle.getBounds());
 
                     // Construct the API URL with user's current latitude and longitude
                     const apiUrl = `https://api.ebird.org/v2/data/obs/geo/recent/notable?lat=${latitude}&lng=${longitude}&back=30&dist=50`;
@@ -468,6 +478,11 @@
             this.birdNames = []; // Reset bird names list
             this.markerGroup.clearLayers(); // Clear existing markers
 
+            if (this.selectionCircle) {
+                this.map.removeLayer(this.selectionCircle);
+                this.selectionCircle = null;
+            }
+
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(position => {
                     const { latitude, longitude } = position.coords;
@@ -476,7 +491,7 @@
                     const searchRadius = 50000; // 50 km
 
                     // Add a circle to show the search buffer area
-                    const searchBufferCircle = L.circle([latitude, longitude], {
+                    this.selectionCircle = L.circle([latitude, longitude], {
                         radius: searchRadius,
                         color: 'blue', // Circle border color
                         opacity: .2,
@@ -484,7 +499,7 @@
                     }).addTo(this.map);
 
                     // Fit map bounds to the circle's bounds
-                    this.map.fitBounds(searchBufferCircle.getBounds());
+                    this.map.fitBounds(this.selectionCircle.getBounds());
 
                     // Construct the API URL with user's current latitude and longitude
                     const apiUrl = `https://api.ebird.org/v2/data/obs/geo/recent?lat=${latitude}&lng=${longitude}&back=30&dist=50`;
@@ -584,6 +599,11 @@
             this.birdNames = []; // Reset bird names list
             this.markerGroup.clearLayers(); // Clear existing markers
 
+            if (this.selectionCircle) {
+                this.map.removeLayer(this.selectionCircle);
+                this.selectionCircle = null;
+            }
+
             // Define the search radius for the circle (in meters)
             const searchRadius = 50000; // 50 km
 
@@ -677,6 +697,10 @@
           this.markerGroup.clearLayers();
           this.map.setView([40.8, -119.5], 5);
           this.isSliderVisible = false;
+          if (this.selectionCircle) {
+                this.map.removeLayer(this.selectionCircle);
+                this.selectionCircle = null;
+            }
           // Any other state resets related to clearing the search
         },
         updateMapMarkers() {
