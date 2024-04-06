@@ -26,7 +26,7 @@
         </div>
         <div class="birdList">
             <div v-for="bird in birdNames" :key="bird.speciesCode">
-                <button class="birdButton" @click="selectDropdown(bird)">{{ bird.comName }}</button>
+                <button class="birdButton" @click="onBirdNameClick(bird)">{{ bird.comName }}</button>
             </div>
         </div>
         <input type="range" v-model="sliderValue" min="0" max="30" class="dateSlider" v-show="isSliderVisible">
@@ -212,6 +212,10 @@
         return {
             searchQuery: '',
             selectedSpecies: '',
+            apiKey: 'g0gbj09j2s1b', // Replace with your actual API key
+            apiURL: '',
+            latitude: null,
+            longitude: null,
             selectedSpeciesCode: '',
             showOptions: false,
             birdNames: [],
@@ -224,6 +228,8 @@
             isSliderVisible: false,
             handleMapClick: false,
             selectionCircle: null,
+            birdButtonClick: false,
+            uniqueBirds: new Map(),
             speciesArray: [{"speciesCode": "acowoo","comName": "Acorn Woodpecker"},{"speciesCode": "afcdov1","comName": "African Collared-Dove"},{"speciesCode": "aldfly","comName": "Alder Flycatcher"},{"speciesCode": "allhum","comName": "Allen's Hummingbird"},{"speciesCode": "ameavo","comName": "American Avocet"},{"speciesCode": "amebit","comName": "American Bittern"},{"speciesCode": "ambduc","comName": "American Black Duck"},{"speciesCode": "y00475","comName": "American Coot"},{"speciesCode": "amecro","comName": "American Crow"},{"speciesCode": "amedip","comName": "American Dipper"},{"speciesCode": "grefla2","comName": "American Flamingo"},{"speciesCode": "amgplo","comName": "American Golden-Plover"},{"speciesCode": "amegfi","comName": "American Goldfinch"},{"speciesCode": "norgos","comName": "American Goshawk"},{"speciesCode": "amekes","comName": "American Kestrel"},{"speciesCode": "amepip","comName": "American Pipit"},{"speciesCode": "amered","comName": "American Redstart"},{"speciesCode": "amerob","comName": "American Robin"},{"speciesCode": "attwoo1","comName": "American Three-toed Woodpecker"},{"speciesCode": "amtspa","comName": "American Tree Sparrow"},{"speciesCode": "amwpel","comName": "American White Pelican"},{"speciesCode": "amewig","comName": "American Wigeon"},{"speciesCode": "x00611","comName": "American Wigeon x Mallard (hybrid)"},{"speciesCode": "x00196","comName": "American Wigeon x Northern Pintail (hybrid)"},{"speciesCode": "ancmur","comName": "Ancient Murrelet"},{"speciesCode": "annhum","comName": "Anna's Hummingbird"},{"speciesCode": "x00739","comName": "Anna's Hummingbird x Selasphorus sp. (hybrid)"},{"speciesCode": "x00618","comName": "Anna's x Costa's Hummingbird (hybrid)"},{"speciesCode": "x00626","comName": "Anna's x Rufous Hummingbird (hybrid)"},{"speciesCode": "antalb1","comName": "Antipodean Albatross"},{"speciesCode": "arcloo","comName": "Arctic Loon"},{"speciesCode": "arcter","comName": "Arctic Tern"},{"speciesCode": "astfly","comName": "Ash-throated Flycatcher"},{"speciesCode": "asspet","comName": "Ashy Storm-Petrel"},{"speciesCode": "baitea","comName": "Baikal Teal"},{"speciesCode": "baisan","comName": "Baird's Sandpiper"},{"speciesCode": "baleag","comName": "Bald Eagle"},{"speciesCode": "balori","comName": "Baltimore Oriole"},{"speciesCode": "batpig1","comName": "Band-tailed Pigeon"},{"speciesCode": "banswa","comName": "Bank Swallow"},{"speciesCode": "bahgoo","comName": "Bar-headed Goose"},{"speciesCode": "batgod","comName": "Bar-tailed Godwit"},{"speciesCode": "brnowl","comName": "Barn Owl"},{"speciesCode": "barswa","comName": "Barn Swallow"},{"speciesCode": "x00717","comName": "Barn x Cliff Swallow (hybrid)"},{"speciesCode": "bargoo","comName": "Barnacle Goose"},{"speciesCode": "x00416","comName": "Barnacle x Cackling Goose (hybrid)"},{"speciesCode": "brdowl","comName": "Barred Owl"},{"speciesCode": "bargol","comName": "Barrow's Goldeneye"},{"speciesCode": "x00426","comName": "Barrow's Goldeneye x Hooded Merganser (hybrid)"},{"speciesCode": "babwar","comName": "Bay-breasted Warbler"},{"speciesCode": "belvir","comName": "Bell's Vireo"},{"speciesCode": "belkin1","comName": "Belted Kingfisher"},{"speciesCode": "bewwre","comName": "Bewick's Wren"},{"speciesCode": "blkoys","comName": "Black Oystercatcher"},{"speciesCode": "blkpho","comName": "Black Phoebe"},{"speciesCode": "bkrfin","comName": "Black Rosy-Finch"},{"speciesCode": "blksco2","comName": "Black Scoter"},{"speciesCode": "blkski","comName": "Black Skimmer"},{"speciesCode": "bkspet","comName": "Black Storm-Petrel"},{"speciesCode": "blkswa","comName": "Black Swan"},{"speciesCode": "blkswi","comName": "Black Swift"},{"speciesCode": "blkter","comName": "Black Tern"},{"speciesCode": "blktur","comName": "Black Turnstone"},{"speciesCode": "blkvul","comName": "Black Vulture"},{"speciesCode": "x00621","comName": "Black x Eastern Phoebe (hybrid)"},{"speciesCode": "bawwar","comName": "Black-and-white Warbler"},{"speciesCode": "bkbwoo","comName": "Black-backed Woodpecker"},{"speciesCode": "bkbplo","comName": "Black-bellied Plover"},{"speciesCode": "bbwduc","comName": "Black-bellied Whistling-Duck"},{"speciesCode": "bkbmag1","comName": "Black-billed Magpie"},{"speciesCode": "bkcchi","comName": "Black-capped Chickadee"},{"speciesCode": "x00623","comName": "Black-capped x Mountain Chickadee (hybrid)"},{"speciesCode": "bkchum","comName": "Black-chinned Hummingbird"},{"speciesCode": "bkcspa","comName": "Black-chinned Sparrow"},{"speciesCode": "x00651","comName": "Black-chinned x Anna's Hummingbird (hybrid)"},{"speciesCode": "x00738","comName": "Black-chinned x Rufous Hummingbird (hybrid)"},{"speciesCode": "bcnher","comName": "Black-crowned Night Heron"},{"speciesCode": "bkfalb","comName": "Black-footed Albatross"},{"speciesCode": "bkhgro","comName": "Black-headed Grosbeak"},{"speciesCode": "bkhgul","comName": "Black-headed Gull"},{"speciesCode": "bklkit","comName": "Black-legged Kittiwake"},{"speciesCode": "bknsti","comName": "Black-necked Stilt"},{"speciesCode": "btbwar","comName": "Black-throated Blue Warbler"},{"speciesCode": "btywar","comName": "Black-throated Gray Warbler"},{"speciesCode": "btnwar","comName": "Black-throated Green Warbler"},{"speciesCode": "bktspa","comName": "Black-throated Sparrow"},{"speciesCode": "bkvshe","comName": "Black-vented Shearwater"},{"speciesCode": "bkbwar","comName": "Blackburnian Warbler"},{"speciesCode": "bkpwar","comName": "Blackpoll Warbler"},{"speciesCode": "blugrb1","comName": "Blue Grosbeak"},{"speciesCode": "blujay","comName": "Blue Jay"},{"speciesCode": "bfoboo","comName": "Blue-footed Booby"},{"speciesCode": "buggna","comName": "Blue-gray Gnatcatcher"},{"speciesCode": "buhvir","comName": "Blue-headed Vireo"},{"speciesCode": "buwtea","comName": "Blue-winged Teal"},{"speciesCode": "x00629","comName": "Blue-winged Teal x Northern Shoveler (hybrid)"},{"speciesCode": "buwwar","comName": "Blue-winged Warbler"},{"speciesCode": "bwxtea1","comName": "Blue-winged x Cinnamon Teal (hybrid)"},{"speciesCode": "x00673","comName": "Blue-winged x Green-winged Teal (hybrid)"},{"speciesCode": "boboli","comName": "Bobolink"},{"speciesCode": "bohwax","comName": "Bohemian Waxwing"},{"speciesCode": "bongul","comName": "Bonaparte's Gull"},{"speciesCode": "borowl","comName": "Boreal Owl"},{"speciesCode": "brambl","comName": "Brambling"},{"speciesCode": "bracor","comName": "Brandt's Cormorant"},{"speciesCode": "brant","comName": "Brant"},{"speciesCode": "brebla","comName": "Brewer's Blackbird"},{"speciesCode": "brespa","comName": "Brewer's Sparrow"},{"speciesCode": "brewar","comName": "Brewster's Warbler (hybrid)"},{"speciesCode": "brtcur","comName": "Bristle-thighed Curlew"},{"speciesCode": "brbhum","comName": "Broad-billed Hummingbird"},{"speciesCode": "brthum","comName": "Broad-tailed Hummingbird"},{"speciesCode": "brwhaw","comName": "Broad-winged Hawk"},{"speciesCode": "brnboo","comName": "Brown Booby"},{"speciesCode": "brncre","comName": "Brown Creeper"},{"speciesCode": "brnpel","comName": "Brown Pelican"},{"speciesCode": "brnthr","comName": "Brown Thrasher"},{"speciesCode": "bnhcow","comName": "Brown-headed Cowbird"},{"speciesCode": "budger","comName": "Budgerigar"},{"speciesCode": "bubsan","comName": "Buff-breasted Sandpiper"},{"speciesCode": "buffle","comName": "Bufflehead"},{"speciesCode": "x00655","comName": "Bufflehead x Common Goldeneye (hybrid)"},{"speciesCode": "x00909","comName": "Bufflehead x goldeneye sp. (hybrid)"},{"speciesCode": "bulshe","comName": "Buller's Shearwater"},{"speciesCode": "bulori","comName": "Bullock's Oriole"},{"speciesCode": "burowl","comName": "Burrowing Owl"},{"speciesCode": "bushti","comName": "Bushtit"},{"speciesCode": "cacgoo1","comName": "Cackling Goose"},{"speciesCode": "calcon","comName": "California Condor"},{"speciesCode": "calgul","comName": "California Gull"},{"speciesCode": "calqua","comName": "California Quail"},{"speciesCode": "cowscj1","comName": "California Scrub-Jay"},{"speciesCode": "calthr","comName": "California Thrasher"},{"speciesCode": "caltow","comName": "California Towhee"},{"speciesCode": "calhum","comName": "Calliope Hummingbird"},{"speciesCode": "cangoo","comName": "Canada Goose"},{"speciesCode": "gryjay","comName": "Canada Jay"},{"speciesCode": "canwar","comName": "Canada Warbler"},{"speciesCode": "canvas","comName": "Canvasback"},{"speciesCode": "x00684","comName": "Canvasback x Redhead (hybrid)"},{"speciesCode": "canwre","comName": "Canyon Wren"},{"speciesCode": "camwar","comName": "Cape May Warbler"},{"speciesCode": "caster1","comName": "Caspian Tern"},{"speciesCode": "casauk","comName": "Cassin's Auklet"},{"speciesCode": "casfin","comName": "Cassin's Finch"},{"speciesCode": "caskin","comName": "Cassin's Kingbird"},{"speciesCode": "casspa","comName": "Cassin's Sparrow"},{"speciesCode": "casvir","comName": "Cassin's Vireo"},{"speciesCode": "cavswa","comName": "Cave Swallow"},{"speciesCode": "cedwax","comName": "Cedar Waxwing"},{"speciesCode": "chbchi","comName": "Chestnut-backed Chickadee"},{"speciesCode": "chclon","comName": "Chestnut-collared Longspur"},{"speciesCode": "chswar","comName": "Chestnut-sided Warbler"},{"speciesCode": "chiswi","comName": "Chimney Swift"},{"speciesCode": "chispa","comName": "Chipping Sparrow"},{"speciesCode": "chukar","comName": "Chukar"},{"speciesCode": "cintea","comName": "Cinnamon Teal"},{"speciesCode": "x00630","comName": "Cinnamon Teal x Northern Shoveler (hybrid)"},{"speciesCode": "x00763","comName": "Cinnamon x Green-winged Teal (hybrid)"},{"speciesCode": "clagre","comName": "Clark's Grebe"},{"speciesCode": "clanut","comName": "Clark's Nutcracker"},{"speciesCode": "clcspa","comName": "Clay-colored Sparrow"},{"speciesCode": "cliswa","comName": "Cliff Swallow"},{"speciesCode": "cockat","comName": "Cockatiel"},{"speciesCode": "comcra","comName": "Common Crane"},{"speciesCode": "comeid","comName": "Common Eider"},{"speciesCode": "comgal1","comName": "Common Gallinule"},{"speciesCode": "comgol","comName": "Common Goldeneye"},{"speciesCode": "x00425","comName": "Common Goldeneye x Hooded Merganser (hybrid)"},{"speciesCode": "comgra","comName": "Common Grackle"},{"speciesCode": "cogdov","comName": "Common Ground Dove"},{"speciesCode": "comloo","comName": "Common Loon"},{"speciesCode": "commer","comName": "Common Merganser"},{"speciesCode": "commur","comName": "Common Murre"},{"speciesCode": "comnig","comName": "Common Nighthawk"},{"speciesCode": "compoo","comName": "Common Poorwill"},{"speciesCode": "comrav","comName": "Common Raven"},{"speciesCode": "comred","comName": "Common Redpoll"},{"speciesCode": "blksco1","comName": "Common Scoter"},{"speciesCode": "comter","comName": "Common Tern"},{"speciesCode": "cxbgol1","comName": "Common x Barrow's Goldeneye (hybrid)"},{"speciesCode": "comyel","comName": "Common Yellowthroat"},{"speciesCode": "coopet","comName": "Cook's Petrel"},{"speciesCode": "coohaw","comName": "Cooper's Hawk"},{"speciesCode": "coshum","comName": "Costa's Hummingbird"},{"speciesCode": "y00678","comName": "Crested Caracara"},{"speciesCode": "cursan","comName": "Curlew Sandpiper"},{"speciesCode": "cubthr","comName": "Curve-billed Thrasher"},{"speciesCode": "daejun","comName": "Dark-eyed Junco"},{"speciesCode": "dickci","comName": "Dickcissel"},{"speciesCode": "x00759","comName": "Domestic goose sp. x Canada Goose (hybrid)"},{"speciesCode": "doccor","comName": "Double-crested Cormorant"},{"speciesCode": "x00783","comName": "Double-crested x Neotropic Cormorant (hybrid)"},{"speciesCode": "dowwoo","comName": "Downy Woodpecker"},{"speciesCode": "dunlin","comName": "Dunlin"},{"speciesCode": "dusfly","comName": "Dusky Flycatcher"},{"speciesCode": "dusgro","comName": "Dusky Grouse"},{"speciesCode": "dusthr2","comName": "Dusky Thrush"},{"speciesCode": "duswar","comName": "Dusky Warbler"},{"speciesCode": "ducfly","comName": "Dusky-capped Flycatcher"},{"speciesCode": "eargre","comName": "Eared Grebe"},{"speciesCode": "easblu","comName": "Eastern Bluebird"},{"speciesCode": "easkin","comName": "Eastern Kingbird"},{"speciesCode": "easpho","comName": "Eastern Phoebe"},{"speciesCode": "eastow","comName": "Eastern Towhee"},{"speciesCode": "easwpw1","comName": "Eastern Whip-poor-will"},{"speciesCode": "eawpew","comName": "Eastern Wood-Pewee"},{"speciesCode": "eaywag","comName": "Eastern Yellow Wagtail"},{"speciesCode": "egygoo","comName": "Egyptian Goose"},{"speciesCode": "eleter1","comName": "Elegant Tern"},{"speciesCode": "empgoo","comName": "Emperor Goose"},{"speciesCode": "eucdov","comName": "Eurasian Collared-Dove"},{"speciesCode": "x00767","comName": "Eurasian Collared-Dove x Mourning Dove (hybrid)"},{"speciesCode": "eurdot","comName": "Eurasian Dotterel"},{"speciesCode": "skylar","comName": "Eurasian Skylark"},{"speciesCode": "eurwig","comName": "Eurasian Wigeon"},{"speciesCode": "x00421","comName": "Eurasian x American Wigeon (hybrid)"},{"speciesCode": "eurgol","comName": "European Goldfinch"},{"speciesCode": "eursta","comName": "European Starling"},{"speciesCode": "evegro","comName": "Evening Grosbeak"},{"speciesCode": "falduc","comName": "Falcated Duck"},{"speciesCode": "ferhaw","comName": "Ferruginous Hawk"},{"speciesCode": "fiespa","comName": "Field Sparrow"},{"speciesCode": "flaowl","comName": "Flammulated Owl"},{"speciesCode": "flfshe","comName": "Flesh-footed Shearwater"},{"speciesCode": "ftspet","comName": "Fork-tailed Storm-Petrel"},{"speciesCode": "forter","comName": "Forster's Tern"},{"speciesCode": "foxspa","comName": "Fox Sparrow"},{"speciesCode": "fragul","comName": "Franklin's Gull"},{"speciesCode": "fuwduc","comName": "Fulvous Whistling-Duck"},{"speciesCode": "gadwal","comName": "Gadwall"},{"speciesCode": "x00724","comName": "Gadwall x American Wigeon (hybrid)"},{"speciesCode": "x00420","comName": "Gadwall x Mallard (hybrid)"},{"speciesCode": "gamqua","comName": "Gambel's Quail"},{"speciesCode": "gargan","comName": "Garganey"},{"speciesCode": "glagul","comName": "Glaucous Gull"},{"speciesCode": "x00048","comName": "Glaucous x Glaucous-winged Gull (hybrid)"},{"speciesCode": "glwgul","comName": "Glaucous-winged Gull"},{"speciesCode": "gloibi","comName": "Glossy Ibis"},{"speciesCode": "goleag","comName": "Golden Eagle"},{"speciesCode": "golphe","comName": "Golden Pheasant"},{"speciesCode": "gockin","comName": "Golden-crowned Kinglet"},{"speciesCode": "gocspa","comName": "Golden-crowned Sparrow"},{"speciesCode": "x00720","comName": "Golden-crowned x White-throated Sparrow (hybrid)"},{"speciesCode": "gowwar","comName": "Golden-winged Warbler"},{"speciesCode": "x00631","comName": "goldeneye sp. x Hooded Merganser (hybrid)"},{"speciesCode": "graspa","comName": "Grasshopper Sparrow"},{"speciesCode": "grycat","comName": "Gray Catbird"},{"speciesCode": "gryfly","comName": "Gray Flycatcher"},{"speciesCode": "grepar","comName": "Gray Parrot"},{"speciesCode": "grypar","comName": "Gray Partridge"},{"speciesCode": "gycthr","comName": "Gray-cheeked Thrush"},{"speciesCode": "gcrfin","comName": "Gray-crowned Rosy-Finch"},{"speciesCode": "gragoo","comName": "Graylag Goose"},{"speciesCode": "x00758","comName": "Graylag x Canada Goose (hybrid)"},{"speciesCode": "x00776","comName": "Graylag x Swan Goose (hybrid)"},{"speciesCode": "grbher3","comName": "Great Blue Heron"},{"speciesCode": "grcfly","comName": "Great Crested Flycatcher"},{"speciesCode": "greegr","comName": "Great Egret"},{"speciesCode": "grgowl","comName": "Great Gray Owl"},{"speciesCode": "grhowl","comName": "Great Horned Owl"},{"speciesCode": "grekno","comName": "Great Knot"},{"speciesCode": "greshe","comName": "Great Shearwater"},{"speciesCode": "grtgra","comName": "Great-tailed Grackle"},{"speciesCode": "greroa","comName": "Greater Roadrunner"},{"speciesCode": "saggro","comName": "Greater Sage-Grouse"},{"speciesCode": "gresca","comName": "Greater Scaup"},{"speciesCode": "gwfgoo","comName": "Greater White-fronted Goose"},{"speciesCode": "x00414","comName": "Greater White-fronted x Cackling Goose (hybrid)"},{"speciesCode": "x00415","comName": "Greater White-fronted x Canada Goose (hybrid)"},{"speciesCode": "greyel","comName": "Greater Yellowlegs"},{"speciesCode": "grnher","comName": "Green Heron"},{"speciesCode": "rinphe2","comName": "Green Pheasant"},{"speciesCode": "gnttow","comName": "Green-tailed Towhee"},{"speciesCode": "gnwtea","comName": "Green-winged Teal"},{"speciesCode": "xanmur1","comName": "Guadalupe Murrelet"},{"speciesCode": "gyrfal","comName": "Gyrfalcon"},{"speciesCode": "haiwoo","comName": "Hairy Woodpecker"},{"speciesCode": "hamfly","comName": "Hammond's Flycatcher"},{"speciesCode": "harduc","comName": "Harlequin Duck"},{"speciesCode": "hrshaw","comName": "Harris's Hawk"},{"speciesCode": "harspa","comName": "Harris's Sparrow"},{"speciesCode": "hawpet1","comName": "Hawaiian Petrel"},{"speciesCode": "heegul","comName": "Heermann's Gull"},{"speciesCode": "helgui","comName": "Helmeted Guineafowl"},{"speciesCode": "herthr","comName": "Hermit Thrush"},{"speciesCode": "herwar","comName": "Hermit Warbler"},{"speciesCode": "hergul","comName": "Herring Gull"},{"speciesCode": "nelgul","comName": "Herring x Glaucous Gull (hybrid)"},{"speciesCode": "x00050","comName": "Herring x Glaucous-winged Gull (hybrid)"},{"speciesCode": "hoared","comName": "Hoary Redpoll"},{"speciesCode": "hoomer","comName": "Hooded Merganser"},{"speciesCode": "hooori","comName": "Hooded Oriole"},{"speciesCode": "hoowar","comName": "Hooded Warbler"},{"speciesCode": "horgre","comName": "Horned Grebe"},{"speciesCode": "horlar","comName": "Horned Lark"},{"speciesCode": "horpuf","comName": "Horned Puffin"},{"speciesCode": "houfin","comName": "House Finch"},{"speciesCode": "houspa","comName": "House Sparrow"},{"speciesCode": "houwre","comName": "House Wren"},{"speciesCode": "hudgod","comName": "Hudsonian Godwit"},{"speciesCode": "hutvir","comName": "Hutton's Vireo"},{"speciesCode": "y00478","comName": "Iceland Gull"},{"speciesCode": "compea","comName": "Indian Peafowl"},{"speciesCode": "indbun","comName": "Indigo Bunting"},{"speciesCode": "jacsni","comName": "Jack Snipe"},{"speciesCode": "jufpet","comName": "Juan Fernandez Petrel"},{"speciesCode": "juntit1","comName": "Juniper Titmouse"},{"speciesCode": "kenwar","comName": "Kentucky Warbler"},{"speciesCode": "killde","comName": "Killdeer"},{"speciesCode": "kineid","comName": "King Eider"},{"speciesCode": "lanfal1","comName": "Lanner Falcon"},{"speciesCode": "laplon","comName": "Lapland Longspur"},{"speciesCode": "larbun","comName": "Lark Bunting"},{"speciesCode": "larspa","comName": "Lark Sparrow"},{"speciesCode": "laugul","comName": "Laughing Gull"},{"speciesCode": "lawgol","comName": "Lawrence's Goldfinch"},{"speciesCode": "layalb","comName": "Laysan Albatross"},{"speciesCode": "x00017","comName": "Laysan x Black-footed Albatross (hybrid)"},{"speciesCode": "lazbun","comName": "Lazuli Bunting"},{"speciesCode": "ixlbun","comName": "Lazuli x Indigo Bunting (hybrid)"},{"speciesCode": "lcspet","comName": "Leach's Storm-Petrel"},{"speciesCode": "leabit","comName": "Least Bittern"},{"speciesCode": "leafly","comName": "Least Flycatcher"},{"speciesCode": "leasan","comName": "Least Sandpiper"},{"speciesCode": "leater1","comName": "Least Tern"},{"speciesCode": "lecspa","comName": "LeConte's Sparrow"},{"speciesCode": "lbbgul","comName": "Lesser Black-backed Gull"},{"speciesCode": "lesgol","comName": "Lesser Goldfinch"},{"speciesCode": "lesnig","comName": "Lesser Nighthawk"},{"speciesCode": "lessca","comName": "Lesser Scaup"},{"speciesCode": "x00714","comName": "Lesser x American Goldfinch (hybrid)"},{"speciesCode": "lesyel","comName": "Lesser Yellowlegs"},{"speciesCode": "lewwoo","comName": "Lewis's Woodpecker"},{"speciesCode": "linspa","comName": "Lincoln's Sparrow"},{"speciesCode": "libher","comName": "Little Blue Heron"},{"speciesCode": "litbun","comName": "Little Bunting"},{"speciesCode": "litgul","comName": "Little Gull"},{"speciesCode": "litsti","comName": "Little Stint"},{"speciesCode": "logshr","comName": "Loggerhead Shrike"},{"speciesCode": "lobcur","comName": "Long-billed Curlew"},{"speciesCode": "lobdow","comName": "Long-billed Dowitcher"},{"speciesCode": "lobmur","comName": "Long-billed Murrelet"},{"speciesCode": "loeowl","comName": "Long-eared Owl"},{"speciesCode": "lotduc","comName": "Long-tailed Duck"},{"speciesCode": "lotjae","comName": "Long-tailed Jaeger"},{"speciesCode": "lotsti","comName": "Long-toed Stint"},{"speciesCode": "louwat","comName": "Louisiana Waterthrush"},{"speciesCode": "lucwar","comName": "Lucy's Warbler"},{"speciesCode": "macwar","comName": "MacGillivray's Warbler"},{"speciesCode": "x00700","comName": "MacGillivray's Warbler x Common Yellowthroat (hybrid)"},{"speciesCode": "magfri","comName": "Magnificent Frigatebird"},{"speciesCode": "magwar","comName": "Magnolia Warbler"},{"speciesCode": "mallar3","comName": "Mallard"},{"speciesCode": "x00670","comName": "Mallard x Green-winged Teal (hybrid)"},{"speciesCode": "x00628","comName": "Mallard x Northern Pintail (hybrid)"},{"speciesCode": "manduc","comName": "Mandarin Duck"},{"speciesCode": "manshe","comName": "Manx Shearwater"},{"speciesCode": "margod","comName": "Marbled Godwit"},{"speciesCode": "marmur","comName": "Marbled Murrelet"},{"speciesCode": "marwre","comName": "Marsh Wren"},{"speciesCode": "mckbun","comName": "McKay's Bunting"},{"speciesCode": "merlin","comName": "Merlin"},{"speciesCode": "monpar","comName": "Monk Parakeet"},{"speciesCode": "motpet","comName": "Mottled Petrel"},{"speciesCode": "moublu","comName": "Mountain Bluebird"},{"speciesCode": "mouchi","comName": "Mountain Chickadee"},{"speciesCode": "mouplo","comName": "Mountain Plover"},{"speciesCode": "mouqua","comName": "Mountain Quail"},{"speciesCode": "moudov","comName": "Mourning Dove"},{"speciesCode": "mouwar","comName": "Mourning Warbler"},{"speciesCode": "murpet","comName": "Murphy's Petrel"},{"speciesCode": "musduc","comName": "Muscovy Duck"},{"speciesCode": "mdxmal1","comName": "Muscovy Duck x Mallard (hybrid)"},{"speciesCode": "mutswa","comName": "Mute Swan"},{"speciesCode": "naswar","comName": "Nashville Warbler"},{"speciesCode": "nazboo1","comName": "Nazca Booby"},{"speciesCode": "norbob","comName": "Northern Bobwhite"},{"speciesCode": "norfli","comName": "Northern Flicker"},{"speciesCode": "norful","comName": "Northern Fulmar"},{"speciesCode": "norhar2","comName": "Northern Harrier"},{"speciesCode": "nohowl","comName": "Northern Hawk Owl"},{"speciesCode": "normoc","comName": "Northern Mockingbird"},{"speciesCode": "norpar","comName": "Northern Parula"},{"speciesCode": "norpin","comName": "Northern Pintail"},{"speciesCode": "nopowl","comName": "Northern Pygmy-Owl"},{"speciesCode": "orabis1","comName": "Northern Red Bishop"},{"speciesCode": "nrwswa","comName": "Northern Rough-winged Swallow"},{"speciesCode": "nswowl","comName": "Northern Saw-whet Owl"},{"speciesCode": "norsho","comName": "Northern Shoveler"},{"speciesCode": "x00777","comName": "Northern Shoveler x American Wigeon (hybrid)"},{"speciesCode": "norshr4","comName": "Northern Shrike"},{"speciesCode": "norwat","comName": "Northern Waterthrush"},{"speciesCode": "norwhe","comName": "Northern Wheatear"},{"speciesCode": "nutwoo","comName": "Nuttall's Woodpecker"},{"speciesCode": "oaktit","comName": "Oak Titmouse"},{"speciesCode": "olsfly","comName": "Olive-sided Flycatcher"},{"speciesCode": "orcwar","comName": "Orange-crowned Warbler"},{"speciesCode": "orcori","comName": "Orchard Oriole"},{"speciesCode": "origre","comName": "Oriental Greenfinch"},{"speciesCode": "osprey","comName": "Osprey"},{"speciesCode": "ovenbi1","comName": "Ovenbird"},{"speciesCode": "pagplo","comName": "Pacific Golden-Plover"},{"speciesCode": "pacloo","comName": "Pacific Loon"},{"speciesCode": "pacwre1","comName": "Pacific Wren"},{"speciesCode": "paibun","comName": "Painted Bunting"},{"speciesCode": "paired","comName": "Painted Redstart"},{"speciesCode": "palwar","comName": "Palm Warbler"},{"speciesCode": "parauk","comName": "Parakeet Auklet"},{"speciesCode": "parjae","comName": "Parasitic Jaeger"},{"speciesCode": "pecsan","comName": "Pectoral Sandpiper"},{"speciesCode": "pelcor","comName": "Pelagic Cormorant"},{"speciesCode": "perfal","comName": "Peregrine Falcon"},{"speciesCode": "phaino","comName": "Phainopepla"},{"speciesCode": "phivir","comName": "Philadelphia Vireo"},{"speciesCode": "pibgre","comName": "Pied-billed Grebe"},{"speciesCode": "piggui","comName": "Pigeon Guillemot"},{"speciesCode": "pilwoo","comName": "Pileated Woodpecker"},{"speciesCode": "pingro","comName": "Pine Grosbeak"},{"speciesCode": "pinsis","comName": "Pine Siskin"},{"speciesCode": "pinwar","comName": "Pine Warbler"},{"speciesCode": "pifshe","comName": "Pink-footed Shearwater"},{"speciesCode": "pinjay","comName": "Pinyon Jay"},{"speciesCode": "pipplo","comName": "Piping Plover"},{"speciesCode": "plsvir","comName": "Plumbeous Vireo"},{"speciesCode": "pomjae","comName": "Pomarine Jaeger"},{"speciesCode": "prafal","comName": "Prairie Falcon"},{"speciesCode": "prawar","comName": "Prairie Warbler"},{"speciesCode": "prowar","comName": "Prothonotary Warbler"},{"speciesCode": "purfin","comName": "Purple Finch"},{"speciesCode": "purmar","comName": "Purple Martin"},{"speciesCode": "pygnut","comName": "Pygmy Nuthatch"},{"speciesCode": "pyrrhu","comName": "Pyrrhuloxia"},{"speciesCode": "redcro","comName": "Red Crossbill"},{"speciesCode": "redjun","comName": "Red Junglefowl"},{"speciesCode": "redkno","comName": "Red Knot"},{"speciesCode": "redpha1","comName": "Red Phalarope"},{"speciesCode": "rebwoo","comName": "Red-bellied Woodpecker"},{"speciesCode": "rebtro","comName": "Red-billed Tropicbird"},{"speciesCode": "rebgoo1","comName": "Red-breasted Goose"},{"speciesCode": "rebmer","comName": "Red-breasted Merganser"},{"speciesCode": "rebnut","comName": "Red-breasted Nuthatch"},{"speciesCode": "rebsap","comName": "Red-breasted Sapsucker"},{"speciesCode": "reevir1","comName": "Red-eyed Vireo"},{"speciesCode": "refblu","comName": "Red-flanked Bluetail"},{"speciesCode": "refboo","comName": "Red-footed Booby"},{"speciesCode": "rehwoo","comName": "Red-headed Woodpecker"},{"speciesCode": "relkit","comName": "Red-legged Kittiwake"},{"speciesCode": "relpar1","comName": "Red-legged Partridge"},{"speciesCode": "rensap","comName": "Red-naped Sapsucker"},{"speciesCode": "rnxsap1","comName": "Red-naped x Red-breasted Sapsucker (hybrid)"},{"speciesCode": "rengre","comName": "Red-necked Grebe"},{"speciesCode": "renpha","comName": "Red-necked Phalarope"},{"speciesCode": "rensti","comName": "Red-necked Stint"},{"speciesCode": "reshaw","comName": "Red-shouldered Hawk"},{"speciesCode": "rethaw","comName": "Red-tailed Hawk"},{"speciesCode": "retloo","comName": "Red-throated Loon"},{"speciesCode": "retpip","comName": "Red-throated Pipit"},{"speciesCode": "rewbla","comName": "Red-winged Blackbird"},{"speciesCode": "redhea","comName": "Redhead"},{"speciesCode": "reephe1","comName": "Reeves's Pheasant"},{"speciesCode": "rhiauk","comName": "Rhinoceros Auklet"},{"speciesCode": "ribgul","comName": "Ring-billed Gull"},{"speciesCode": "rinduc","comName": "Ring-necked Duck"},{"speciesCode": "x00613","comName": "Ring-necked Duck x Lesser Scaup (hybrid)"},{"speciesCode": "x00682","comName": "Ring-necked Duck x scaup sp. (hybrid)"},{"speciesCode": "rinphe1","comName": "Ring-necked Pheasant"},{"speciesCode": "rintea1","comName": "Ringed Teal"},{"speciesCode": "rocpig","comName": "Rock Pigeon"},{"speciesCode": "rocsan","comName": "Rock Sandpiper"},{"speciesCode": "rocwre","comName": "Rock Wren"},{"speciesCode": "robgro","comName": "Rose-breasted Grosbeak"},{"speciesCode": "x00448","comName": "Rose-breasted x Black-headed Grosbeak (hybrid)"},{"speciesCode": "rosgoo","comName": "Ross's Goose"},{"speciesCode": "rosgul","comName": "Ross's Gull"},{"speciesCode": "peflov","comName": "Rosy-faced Lovebird"},{"speciesCode": "rolhaw","comName": "Rough-legged Hawk"},{"speciesCode": "ruckin","comName": "Ruby-crowned Kinglet"},{"speciesCode": "rthhum","comName": "Ruby-throated Hummingbird"},{"speciesCode": "rudduc","comName": "Ruddy Duck"},{"speciesCode": "rudshe","comName": "Ruddy Shelduck"},{"speciesCode": "rudtur","comName": "Ruddy Turnstone"},{"speciesCode": "ruff","comName": "Ruff"},{"speciesCode": "rufgro","comName": "Ruffed Grouse"},{"speciesCode": "rufhum","comName": "Rufous Hummingbird"},{"speciesCode": "x00385","comName": "Rufous x Allen's Hummingbird (hybrid)"},{"speciesCode": "rusbun","comName": "Rustic Bunting"},{"speciesCode": "rusbla","comName": "Rusty Blackbird"},{"speciesCode": "sabgul","comName": "Sabine's Gull"},{"speciesCode": "sagthr","comName": "Sage Thrasher"},{"speciesCode": "sagspa1","comName": "Sagebrush Sparrow"},{"speciesCode": "sander","comName": "Sanderling"},{"speciesCode": "sancra","comName": "Sandhill Crane"},{"speciesCode": "savspa","comName": "Savannah Sparrow"},{"speciesCode": "saypho","comName": "Say's Phoebe"},{"speciesCode": "nutman","comName": "Scaly-breasted Munia"},{"speciesCode": "scatan","comName": "Scarlet Tanager"},{"speciesCode": "sctfly","comName": "Scissor-tailed Flycatcher"},{"speciesCode": "scoori","comName": "Scott's Oriole"},{"speciesCode": "xanmur2","comName": "Scripps's Murrelet"},{"speciesCode": "sedwre1","comName": "Sedge Wren"},{"speciesCode": "semplo","comName": "Semipalmated Plover"},{"speciesCode": "semsan","comName": "Semipalmated Sandpiper"},{"speciesCode": "shshaw","comName": "Sharp-shinned Hawk"},{"speciesCode": "shtgro","comName": "Sharp-tailed Grouse"},{"speciesCode": "shtsan","comName": "Sharp-tailed Sandpiper"},{"speciesCode": "shbdow","comName": "Short-billed Dowitcher"},{"speciesCode": "mewgul2","comName": "Short-billed Gull"},{"speciesCode": "sheowl","comName": "Short-eared Owl"},{"speciesCode": "shtalb","comName": "Short-tailed Albatross"},{"speciesCode": "shtshe","comName": "Short-tailed Shearwater"},{"speciesCode": "lessap2","comName": "Siberian Sand-Plover"},{"speciesCode": "slbgul","comName": "Slaty-backed Gull"},{"speciesCode": "smew","comName": "Smew"},{"speciesCode": "smilon","comName": "Smith's Longspur"},{"speciesCode": "snobun","comName": "Snow Bunting"},{"speciesCode": "snogoo","comName": "Snow Goose"},{"speciesCode": "x00692","comName": "Snow x Cackling Goose (hybrid)"},{"speciesCode": "x00197","comName": "Snow x Canada Goose (hybrid)"},{"speciesCode": "sxrgoo1","comName": "Snow x Ross's Goose (hybrid)"},{"speciesCode": "snoegr","comName": "Snowy Egret"},{"speciesCode": "snoowl1","comName": "Snowy Owl"},{"speciesCode": "snoplo5","comName": "Snowy Plover"},{"speciesCode": "solsan","comName": "Solitary Sandpiper"},{"speciesCode": "sonspa","comName": "Song Sparrow"},{"speciesCode": "soogro1","comName": "Sooty Grouse"},{"speciesCode": "sooshe","comName": "Sooty Shearwater"},{"speciesCode": "sora","comName": "Sora"},{"speciesCode": "sopsku1","comName": "South Polar Skua"},{"speciesCode": "spoowl","comName": "Spotted Owl"},{"speciesCode": "spored","comName": "Spotted Redshank"},{"speciesCode": "sposan","comName": "Spotted Sandpiper"},{"speciesCode": "spotow","comName": "Spotted Towhee"},{"speciesCode": "x00439","comName": "Spotted x Barred Owl (hybrid)"},{"speciesCode": "sprpip","comName": "Sprague's Pipit"},{"speciesCode": "sprgro","comName": "Spruce Grouse"},{"speciesCode": "stepet","comName": "Stejneger's Petrel"},{"speciesCode": "steeid","comName": "Steller's Eider"},{"speciesCode": "stejay","comName": "Steller's Jay"},{"speciesCode": "stisan","comName": "Stilt Sandpiper"},{"speciesCode": "stbori","comName": "Streak-backed Oriole"},{"speciesCode": "strshe","comName": "Streaked Shearwater"},{"speciesCode": "sumtan","comName": "Summer Tanager"},{"speciesCode": "x00824","comName": "Summer x Western Tanager (hybrid)"},{"speciesCode": "sursco","comName": "Surf Scoter"},{"speciesCode": "surfbi","comName": "Surfbird"},{"speciesCode": "swahaw","comName": "Swainson's Hawk"},{"speciesCode": "swathr","comName": "Swainson's Thrush"},{"speciesCode": "swaspa","comName": "Swamp Sparrow"},{"speciesCode": "swagoo1","comName": "Swan Goose"},{"speciesCode": "swagoo3","comName": "Swan Goose x Canada Goose (hybrid)"},{"speciesCode": "tenwar","comName": "Tennessee Warbler"},{"speciesCode": "mcclon","comName": "Thick-billed Longspur"},{"speciesCode": "thbmur","comName": "Thick-billed Murre"},{"speciesCode": "towsol","comName": "Townsend's Solitaire"},{"speciesCode": "towwar","comName": "Townsend's Warbler"},{"speciesCode": "x00664","comName": "Townsend's x Black-throated Green Warbler (hybrid)"},{"speciesCode": "x00059","comName": "Townsend's x Hermit Warbler (hybrid)"},{"speciesCode": "treswa","comName": "Tree Swallow"},{"speciesCode": "tribla","comName": "Tricolored Blackbird"},{"speciesCode": "triher","comName": "Tricolored Heron"},{"speciesCode": "trokin","comName": "Tropical Kingbird"},{"speciesCode": "truswa","comName": "Trumpeter Swan"},{"speciesCode": "tufduc","comName": "Tufted Duck"},{"speciesCode": "x00654","comName": "Tufted Duck x Greater Scaup (hybrid)"},{"speciesCode": "x00653","comName": "Tufted Duck x Lesser Scaup (hybrid)"},{"speciesCode": "tdxsca1","comName": "Tufted Duck x scaup sp. (hybrid)"},{"speciesCode": "tufpuf","comName": "Tufted Puffin"},{"speciesCode": "tunbeg1","comName": "Tundra Bean-Goose"},{"speciesCode": "tunswa","comName": "Tundra Swan"},{"speciesCode": "turvul","comName": "Turkey Vulture"},{"speciesCode": "uplsan","comName": "Upland Sandpiper"},{"speciesCode": "varthr","comName": "Varied Thrush"},{"speciesCode": "vauswi","comName": "Vaux's Swift"},{"speciesCode": "veery","comName": "Veery"},{"speciesCode": "verfly","comName": "Vermilion Flycatcher"},{"speciesCode": "vesspa","comName": "Vesper Sparrow"},{"speciesCode": "vigswa","comName": "Violet-green Swallow"},{"speciesCode": "virrai","comName": "Virginia Rail"},{"speciesCode": "virwar","comName": "Virginia's Warbler"},{"speciesCode": "wantat1","comName": "Wandering Tattler"},{"speciesCode": "warvir","comName": "Warbling Vireo"},{"speciesCode": "wetshe","comName": "Wedge-tailed Shearwater"},{"speciesCode": "wesblu","comName": "Western Bluebird"},{"speciesCode": "categr1","comName": "Western Cattle Egret"},{"speciesCode": "wesfly","comName": "Western Flycatcher"},{"speciesCode": "wesgre","comName": "Western Grebe"},{"speciesCode": "wesgul","comName": "Western Gull"},{"speciesCode": "weskin","comName": "Western Kingbird"},{"speciesCode": "wesmea","comName": "Western Meadowlark"},{"speciesCode": "wessan","comName": "Western Sandpiper"},{"speciesCode": "wesowl1","comName": "Western Screech-Owl"},{"speciesCode": "westan","comName": "Western Tanager"},{"speciesCode": "wewpew","comName": "Western Wood-Pewee"},{"speciesCode": "x00427","comName": "Western x Clark's Grebe (hybrid)"},{"speciesCode": "x00718","comName": "Western x Eastern Kingbird (hybrid)"},{"speciesCode": "x00051","comName": "Western x Glaucous-winged Gull (hybrid)"},{"speciesCode": "x00204","comName": "Western x Mountain Bluebird (hybrid)"},{"speciesCode": "whimbr","comName": "Whimbrel"},{"speciesCode": "whiibi","comName": "White Ibis"},{"speciesCode": "whiwag","comName": "White Wagtail"},{"speciesCode": "whbnut","comName": "White-breasted Nuthatch"},{"speciesCode": "whcalb1","comName": "White-capped Albatross"},{"speciesCode": "whcspa","comName": "White-crowned Sparrow"},{"speciesCode": "x00053","comName": "White-crowned x Golden-crowned Sparrow (hybrid)"},{"speciesCode": "x00451","comName": "White-crowned x White-throated Sparrow (hybrid)"},{"speciesCode": "whevir","comName": "White-eyed Vireo"},{"speciesCode": "whfibi","comName": "White-faced Ibis"},{"speciesCode": "whhwoo","comName": "White-headed Woodpecker"},{"speciesCode": "whrsan","comName": "White-rumped Sandpiper"},{"speciesCode": "whtkit","comName": "White-tailed Kite"},{"speciesCode": "whtpta1","comName": "White-tailed Ptarmigan"},{"speciesCode": "whtspa","comName": "White-throated Sparrow"},{"speciesCode": "whtswi","comName": "White-throated Swift"},{"speciesCode": "whwcro","comName": "White-winged Crossbill"},{"speciesCode": "whwdov","comName": "White-winged Dove"},{"speciesCode": "whwsco2","comName": "White-winged Scoter"},{"speciesCode": "whoswa","comName": "Whooper Swan"},{"speciesCode": "wiltur","comName": "Wild Turkey"},{"speciesCode": "willet1","comName": "Willet"},{"speciesCode": "wilsap","comName": "Williamson's Sapsucker"},{"speciesCode": "wilfly","comName": "Willow Flycatcher"},{"speciesCode": "wilpha","comName": "Wilson's Phalarope"},{"speciesCode": "wilplo","comName": "Wilson's Plover"},{"speciesCode": "wilsni1","comName": "Wilson's Snipe"},{"speciesCode": "wispet","comName": "Wilson's Storm-Petrel"},{"speciesCode": "wlswar","comName": "Wilson's Warbler"},{"speciesCode": "winwre3","comName": "Winter Wren"},{"speciesCode": "wooduc","comName": "Wood Duck"},{"speciesCode": "x00205","comName": "Wood Duck x Mallard (hybrid)"},{"speciesCode": "woosan","comName": "Wood Sandpiper"},{"speciesCode": "woothr","comName": "Wood Thrush"},{"speciesCode": "wooscj2","comName": "Woodhouse's Scrub-Jay"},{"speciesCode": "woewar1","comName": "Worm-eating Warbler"},{"speciesCode": "wrenti","comName": "Wrentit"},{"speciesCode": "yelrai","comName": "Yellow Rail"},{"speciesCode": "yelwar","comName": "Yellow Warbler"},{"speciesCode": "yebfly","comName": "Yellow-bellied Flycatcher"},{"speciesCode": "yebsap","comName": "Yellow-bellied Sapsucker"},{"speciesCode": "x00634","comName": "Yellow-bellied x Red-naped Sapsucker (hybrid)"},{"speciesCode": "yebcuc","comName": "Yellow-billed Cuckoo"},{"speciesCode": "yebloo","comName": "Yellow-billed Loon"},{"speciesCode": "yebcha","comName": "Yellow-breasted Chat"},{"speciesCode": "yeccoc1","comName": "Yellow-crested Cockatoo"},{"speciesCode": "yehbla","comName": "Yellow-headed Blackbird"},{"speciesCode": "yerwar","comName": "Yellow-rumped Warbler"},{"speciesCode": "x00624","comName": "Yellow-rumped x Townsend's Warbler (hybrid)"},{"speciesCode": "yetvir","comName": "Yellow-throated Vireo"},{"speciesCode": "yetwar","comName": "Yellow-throated Warbler"},{"speciesCode": "zebfin2","comName": "Zebra Finch"},{"speciesCode": "zothaw","comName": "Zone-tailed Hawk"}]
         };
       },
@@ -256,7 +262,7 @@
         this.map.on('click', this.mapClickHandler);
       },
       methods: {
- /*        fetchData() {
+ /*     fetchData() {
           const apiKey = "g0gbj09j2s1b";
           const ORUrl = 'https://api.ebird.org/v2/product/spplist/US-OR';
           const taxonomyBaseUrl = 'https://api.ebird.org/v2/ref/taxonomy/ebird?species=';
@@ -396,268 +402,38 @@
             this.showOptions = false;
           }, 200);
         },
-        selectLocalNotables(item) {
-            this.coverScreen = true; // Show loading overlay
-            this.birdNames = []; // Reset bird names list
-            this.markerGroup.clearLayers(); // Clear existing markers
-
-            if (this.selectionCircle) {
-                this.map.removeLayer(this.selectionCircle);
-                this.selectionCircle = null;
-            }
-
+        selectLocalNotables() {
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(position => {
-                    const { latitude, longitude } = position.coords;
-
-                    // Define the search radius (in meters) for the circle
-                    const searchRadius = 50000; // 50 km
-
-                    // Add a circle to show the search buffer area
-                    this.selectionCircle = L.circle([latitude, longitude], {
-                        radius: searchRadius,
-                        color: 'blue', // Circle border color
-                        opacity: .2,
-                        fillOpacity: 0 // Circle fill opacity
-                    }).addTo(this.map);
-
-                    // Fit map bounds to the circle's bounds
-                    this.map.fitBounds(this.selectionCircle.getBounds());
-
-                    // Construct the API URL with user's current latitude and longitude
-                    const apiUrl = `https://api.ebird.org/v2/data/obs/geo/recent/notable?lat=${latitude}&lng=${longitude}&back=30&dist=50`;
-                    const apiKey = "g0gbj09j2s1b"; // Replace with your actual API key
-
-                    fetch(apiUrl, {
-                        headers: { 'X-eBirdApiToken': apiKey }
-                    })
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error('Network response was not ok');
-                        }
-                        return response.json();
-                    })
-                    .then(data => {
-                        let uniqueBirds = new Map();
-
-                        data.forEach(observation => {
-                            // Check if bird species is already in the list
-                            if (!uniqueBirds.has(observation.speciesCode)) {
-                                uniqueBirds.set(observation.speciesCode, {
-                                    comName: observation.comName,
-                                    speciesCode: observation.speciesCode
-                                });
-                            }
-
-                            // Create and add a marker for each observation
-                            const popupContent = `Species: ${observation.comName}<br>Date: ${observation.obsDt}<br>Location: ${observation.locName}`;
-                            const marker = L.marker([observation.lat, observation.lng]).bindPopup(popupContent);
-                            this.markerGroup.addLayer(marker);
-                        });
-
-                        // Populate birdNames with unique birds from observations
-                        this.birdNames = Array.from(uniqueBirds.values()).sort((a, b) => a.comName.localeCompare(b.comName));
-
-                        this.coverScreen = false; // Hide loading overlay
-                    })
-                    .catch(error => {
-                        console.error('Error fetching data:', error);
-                        this.coverScreen = false;
-                    });
+                this.latitude = position.coords.latitude;
+                this.longitude = position.coords.longitude;
+                this.apiURL = `https://api.ebird.org/v2/data/obs/geo/recent/notable?lat=${this.latitude}&lng=${this.longitude}&back=30&dist=50`;
+                this.updateMapMarkersLocal()
                 }, error => {
                     console.error('Error getting location:', error);
-                    this.coverScreen = false;
                 });
             } else {
                 console.log("Geolocation is not supported by this browser.");
-                this.coverScreen = false;
             }
         },
         selectNearMeAll() {
-            this.coverScreen = true; // Show loading overlay
-            this.birdNames = []; // Reset bird names list
-            this.markerGroup.clearLayers(); // Clear existing markers
-
-            if (this.selectionCircle) {
-                this.map.removeLayer(this.selectionCircle);
-                this.selectionCircle = null;
-            }
-
-            if (navigator.geolocation) {
+          if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(position => {
-                    const { latitude, longitude } = position.coords;
-
-                    // Define the search radius (in meters) for the circle
-                    const searchRadius = 50000; // 50 km
-
-                    // Add a circle to show the search buffer area
-                    this.selectionCircle = L.circle([latitude, longitude], {
-                        radius: searchRadius,
-                        color: 'blue', // Circle border color
-                        opacity: .2,
-                        fillOpacity: 0 // Circle fill opacity
-                    }).addTo(this.map);
-
-                    // Fit map bounds to the circle's bounds
-                    this.map.fitBounds(this.selectionCircle.getBounds());
-
-                    // Construct the API URL with user's current latitude and longitude
-                    const apiUrl = `https://api.ebird.org/v2/data/obs/geo/recent?lat=${latitude}&lng=${longitude}&back=30&dist=50`;
-                    const apiKey = "g0gbj09j2s1b"; // Replace with your actual API key
-
-                    fetch(apiUrl, {
-                        headers: { 'X-eBirdApiToken': apiKey }
-                    })
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error('Network response was not ok');
-                        }
-                        return response.json();
-                    })
-                    .then(data => {
-                        let uniqueBirds = new Map();
-
-                        data.forEach(observation => {
-                            // Check if bird species is already in the list
-                            if (!uniqueBirds.has(observation.speciesCode)) {
-                                uniqueBirds.set(observation.speciesCode, {
-                                    comName: observation.comName,
-                                    speciesCode: observation.speciesCode
-                                });
-                            }
-
-                            // Create and add a marker for each observation
-                            const popupContent = `Species: ${observation.comName}<br>Date: ${observation.obsDt}<br>Location: ${observation.locName}`;
-                            const marker = L.marker([observation.lat, observation.lng]).bindPopup(popupContent);
-                            this.markerGroup.addLayer(marker);
-                        });
-
-                        // Populate birdNames with unique birds from observations
-                        this.birdNames = Array.from(uniqueBirds.values()).sort((a, b) => a.comName.localeCompare(b.comName));
-
-                        this.coverScreen = false; // Hide loading overlay
-                    })
-                    .catch(error => {
-                        console.error('Error fetching data:', error);
-                        this.coverScreen = false;
-                    });
+                this.latitude = position.coords.latitude;
+                this.longitude = position.coords.longitude;
+                this.apiURL = `https://api.ebird.org/v2/data/obs/geo/recent?lat=${this.latitude}&lng=${this.longitude}&back=30&dist=50`;
+                this.updateMapMarkersLocal()
                 }, error => {
                     console.error('Error getting location:', error);
-                    this.coverScreen = false;
                 });
             } else {
                 console.log("Geolocation is not supported by this browser.");
-                this.coverScreen = false;
             }
         },
         onBirdNameClick(bird) {
-          this.sliderValue=30;
-          this.coverScreen = true;
-            const apiKey = "g0gbj09j2s1b";
-            this.markerGroup.clearLayers();
-            this.showOptions = false; // Hide the options list
-
-
-            // Define the API URL, inserting the selected species code dynamically
-            const apiUrl = `https://api.ebird.org/v2/data/obs/US-OR/recent/${bird.code}?back=30&r=US-OR-013,US-OR-031,US-OR-017`;
-
-            // Fetch data from the API
-            fetch(apiUrl, {
-                headers: {
-                'X-eBirdApiToken': apiKey
-                }
-            })
-            .then(response => {
-                if (!response.ok) {
-                throw new Error('Network response was not ok');
-                }
-                return response.json();
-            })
-            .then(data => {
-              data.forEach(observation => {
-                    const obsDate = new Date(observation.obsDt);
-                    const dateOptions = { year: 'numeric', month: '2-digit', day: '2-digit' };
-                    const formattedDate = obsDate.toLocaleDateString('en-US', dateOptions);
-                    const timeOptions = { hour: '2-digit', minute: '2-digit', hour12: true };
-                    const formattedTime = obsDate.toLocaleTimeString('en-US', timeOptions);
-                    const popupContent = `Species: ${observation.comName}<br>Date: ${formattedDate} ${formattedTime}</br>Location: ${observation.locName}</br>Bird Info: <a target='_blank' href='https://ebird.org/species/${observation.speciesCode}'>More Info</a>`;
-
-                    const marker = L.marker([observation.lat, observation.lng]).bindPopup(popupContent);
-                    this.markerGroup.addLayer(marker);
-                });
-                if (this.markerGroup.getLayers().length > 0) {
-                    this.map.fitBounds(this.markerGroup.getBounds(), { padding: [30, 30] }); // Adds padding around the bounds
-                }
-                this.coverScreen = false;
-            })
-            .catch(error => {
-                console.error('Error fetching data:', error);
-            });
-        },
-        selectFromMap(latitude, longitude) { 
-          this.coverScreen = true; // Show loading overlay
-            this.birdNames = []; // Reset bird names list
-            this.markerGroup.clearLayers(); // Clear existing markers
-
-            if (this.selectionCircle) {
-                this.map.removeLayer(this.selectionCircle);
-                this.selectionCircle = null;
-            }
-
-            // Define the search radius for the circle (in meters)
-            const searchRadius = 50000; // 50 km
-
-            // Add a circle to show the search buffer area
-            this.selectionCircle = L.circle([latitude, longitude], {
-                radius: searchRadius,
-                color: 'blue', // Circle border color
-                opacity: .2,
-                fillOpacity: 0, // Circle fill opacity
-            }).addTo(this.map);
-
-            // Fit map bounds to the circle's bounds
-            this.map.fitBounds(this.selectionCircle.getBounds());
-
-            // Construct the API URL with clicked location's latitude and longitude
-            const apiUrl = `https://api.ebird.org/v2/data/obs/geo/recent?lat=${latitude}&lng=${longitude}&back=30&dist=50`;
-            const apiKey = "g0gbj09j2s1b"; // Use your actual API key
-
-            fetch(apiUrl, {
-                headers: { 'X-eBirdApiToken': apiKey }
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.json();
-            })
-            .then(data => {
-                let uniqueBirds = new Map();
-
-                data.forEach(observation => {
-                    // Check if bird species is already in the list
-                    if (!uniqueBirds.has(observation.speciesCode)) {
-                        uniqueBirds.set(observation.speciesCode, {
-                            comName: observation.comName,
-                            speciesCode: observation.speciesCode
-                        });
-                    }
-
-                    // Create and add a marker for each observation
-                    const popupContent = `Species: ${observation.comName}<br>Date: ${observation.obsDt}<br>Location: ${observation.locName}`;
-                    const marker = L.marker([observation.lat, observation.lng]).bindPopup(popupContent);
-                    this.markerGroup.addLayer(marker);
-                });
-
-                // Populate birdNames with unique birds from observations
-                this.birdNames = Array.from(uniqueBirds.values()).sort((a, b) => a.comName.localeCompare(b.comName));
-
-                this.coverScreen = false; // Hide loading overlay
-            })
-            .catch(error => {
-                console.error('Error fetching data:', error);
-                this.coverScreen = false;
-            });
+          this.apiURL = `https://api.ebird.org/v2/data/nearest/geo/recent/${bird.speciesCode}?lat=${this.latitude}&lng=${this.longitude}&back=30&dist=50`
+          this.birdButtonClick = true
+          this.updateMapMarkersLocal()
         },
         enableMapClick() {
             // Always set handleMapClick to true when the button is clicked
@@ -675,21 +451,19 @@
             // Clear existing markers
             this.markerGroup.clearLayers();
         },
-
         mapClickHandler(e) {
             // Only proceed if handleMapClick is true
             if (!this.handleMapClick) return;
-
-            const { lat, lng } = e.latlng;
-            this.selectFromMap(lat, lng);
-
+            this.latitude = e.latlng.lat
+            this.longitude = e.latlng.lng
+            this.apiURL = `https://api.ebird.org/v2/data/obs/geo/recent/notable?lat=${this.latitude}&lng=${this.longitude}&back=30&dist=50`;
+            this.birdButtonClick = false;
+            this.updateMapMarkersLocal()
             // Reset handleMapClick to false to prevent additional selections until the button is clicked again
             this.handleMapClick = false;
-
             // Change the cursor back to default after a selection is made
             this.map.getContainer().style.cursor = '';
         },
-
         clearSearch() {
           this.birdNames = [];
           this.sliderValue = 30;
@@ -757,6 +531,62 @@
           });
 
           this.coverScreen = false; // Hide loading indication
+        },
+        updateMapMarkersLocal() {
+            this.isSliderVisible = false;
+            this.coverScreen = true; // Show loading overlay
+            this.uniqueBirds = new Map();
+            this.markerGroup.clearLayers(); // Clear existing markers
+            if (this.selectionCircle) {
+                this.map.removeLayer(this.selectionCircle);
+                this.selectionCircle = null;
+            }
+            // Add a circle to show the search buffer area
+            this.selectionCircle = L.circle([this.latitude, this.longitude], {
+                radius: 50000,
+                color: 'blue', // Circle border color
+                opacity: .2,
+                fillOpacity: 0 // Circle fill opacity
+            }).addTo(this.map);
+
+            // Fit map bounds to the circle's bounds
+            this.map.fitBounds(this.selectionCircle.getBounds());
+
+            fetch(this.apiURL, {
+                headers: { 'X-eBirdApiToken': this.apiKey }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                data.forEach(observation => {
+
+                    // Check if bird species is already in the list
+                    if (!this.uniqueBirds.has(observation.speciesCode)) {
+                        this.uniqueBirds.set(observation.speciesCode, {
+                            comName: observation.comName,
+                            speciesCode: observation.speciesCode
+                        });
+                    }
+                    // Create and add a marker for each observation
+                    const popupContent = `Species: ${observation.comName}<br>Date: ${observation.obsDt}<br>Location: ${observation.locName}</br>Bird Info: <a target='_blank' href='https://ebird.org/species/${observation.speciesCode}'>More Info</a>`;
+                    const marker = L.marker([observation.lat, observation.lng]).bindPopup(popupContent);
+                    this.markerGroup.addLayer(marker);
+                });
+                if (!this.birdButtonClick) {
+                  this.birdNames = [];
+                  this.birdNames = Array.from(this.uniqueBirds.values()).sort((a, b) => a.comName.localeCompare(b.comName));
+                }
+                this.birdButtonClick = false;
+                this.coverScreen = false; // Hide loading overlay
+            })
+            .catch(error => {
+                console.error('Error fetching data:', error);
+                this.coverScreen = false;
+            });
         },
       }
     });
