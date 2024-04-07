@@ -23,6 +23,7 @@
             <button class="searchButton" @click="selectLocalNotables">local notables</button>
             <button class="searchButton" @click="selectNearMeAll">near me</button>
             <button class="searchButton" @click="enableMapClick">click map</button>
+            <button class="searchButton" @click="selectHotspots">hotspots</button>
         </div>
         <div class="birdList">
             <div v-for="bird in birdNames" :key="bird.speciesCode">
@@ -150,6 +151,10 @@
         left: 60px;
         top: 55px;
         z-index: 100;
+        width: 250px;
+    }
+    button {
+      margin-bottom: 5px;
     }
     #map {
         position: absolute;
@@ -429,6 +434,20 @@
                 console.log("Geolocation is not supported by this browser.");
             }
         },
+        selectHotspots() {
+          if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(position => {
+                this.latitude = position.coords.latitude;
+                this.longitude = position.coords.longitude;
+                this.apiURL = `https://api.ebird.org/v2/ref/hotspot/geo?lat=${this.latitude}&lng=${this.longitude}&back=30&dist=50&fmt=json`;
+                this.updateMapMarkersHotspot()
+                }, error => {
+                    console.error('Error getting location:', error);
+                });
+            } else {
+                console.log("Geolocation is not supported by this browser.");
+            }
+        },
         onBirdNameClick(bird) {
           this.apiURL = `https://api.ebird.org/v2/data/nearest/geo/recent/${bird.speciesCode}?lat=${this.latitude}&lng=${this.longitude}&back=30&dist=50`
           this.birdButtonClick = true
@@ -455,7 +474,7 @@
             if (!this.handleMapClick) return;
             this.latitude = e.latlng.lat
             this.longitude = e.latlng.lng
-            this.apiURL = `https://api.ebird.org/v2/data/obs/geo/recent/notable?lat=${this.latitude}&lng=${this.longitude}&back=30&dist=50`;
+            this.apiURL = `https://api.ebird.org/v2/data/obs/geo/recent?lat=${this.latitude}&lng=${this.longitude}&back=30&dist=50`;
             this.birdButtonClick = false;
             this.updateMapMarkersLocal()
             // Reset handleMapClick to false to prevent additional selections until the button is clicked again
@@ -518,12 +537,12 @@
             }
 
             const popupContent = `Species: ${observation.comName}<br>Date: ${observation.obsDt}<br>Location: ${observation.locName}`;
-            const circle = L.circle([observation.lat, observation.lng], {
+            const circle = new L.CircleMarker([observation.lat, observation.lng], {
               color: color,
               opacity: 0,
               fillColor: color,
               fillOpacity: 0.2,
-              radius: 7000 // Adjust the radius as needed
+              radius: 3
             }).bindPopup(popupContent);
 
             this.markerGroup.addLayer(circle);
@@ -580,6 +599,72 @@
                   this.birdNames = Array.from(this.uniqueBirds.values()).sort((a, b) => a.comName.localeCompare(b.comName));
                 }
                 this.birdButtonClick = false;
+                this.coverScreen = false; // Hide loading overlay
+            })
+            .catch(error => {
+                console.error('Error fetching data:', error);
+                this.coverScreen = false;
+            });
+        },
+        updateMapMarkersHotspot() {
+            this.isSliderVisible = false;
+            this.coverScreen = true; // Show loading overlay
+            this.markerGroup.clearLayers(); // Clear existing markers
+            if (this.selectionCircle) {
+                this.map.removeLayer(this.selectionCircle);
+                this.selectionCircle = null;
+            }
+            this.selectionCircle = L.circle([this.latitude, this.longitude], {
+                radius: 20,
+                color: 'black', // Circle border color
+                opacity: .5,
+                fillOpacity: .5 // Circle fill opacity
+            }).addTo(this.map);
+            this.selectionCircle = L.circle([this.latitude, this.longitude], {
+                radius: 50000,
+                color: 'blue', // Circle border color
+                opacity: .2,
+                fillOpacity: 0 // Circle fill opacity
+            }).addTo(this.map);
+
+
+            // Fit map bounds to the circle's bounds
+            this.map.fitBounds(this.selectionCircle.getBounds());
+
+            fetch(this.apiURL, {
+                headers: { 'X-eBirdApiToken': this.apiKey }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                data.forEach(observation => {
+                  if (observation.numSpeciesAllTime <= 50) {
+                    color = 'blue';
+                    fill = .1
+                  } else if (observation.numSpeciesAllTime <= 100) {
+                    color = 'blue';
+                    fill = .3
+                  } else if (observation.numSpeciesAllTime <= 200) {
+                    color = 'orange';
+                    fill = .4
+                  } else {
+                    color = 'red';
+                    fill = .5
+                  }
+                    const popupContent = `Location: ${observation.locName}</br>Species Seen: ${observation.numSpeciesAllTime}</br>Location Info: <a target='_blank' href='https://ebird.org/hotspot/${observation.locId}'>More Info</a>`;
+                    const marker = new L.CircleMarker([observation.lat, observation.lng], {
+                      radius:10,
+                      fillColor: color,
+                      opacity: 0,
+                      fillOpacity: fill
+                    }).bindPopup(popupContent);
+                    this.markerGroup.addLayer(marker);
+                });
+
                 this.coverScreen = false; // Hide loading overlay
             })
             .catch(error => {
