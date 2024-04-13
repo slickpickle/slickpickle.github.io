@@ -239,7 +239,7 @@
       },
       watch: {
         sliderValue(newVal) {
-          this.updateMapMarkers();
+          this.updateMapMarkersSlider();
         }
       },
       computed: {
@@ -266,85 +266,6 @@
         this.map.on('click', this.mapClickHandler);
       },
       methods: {
- /*     fetchData() {
-          const apiKey = "g0gbj09j2s1b";
-          const ORUrl = 'https://api.ebird.org/v2/product/spplist/US-OR';
-          const taxonomyBaseUrl = 'https://api.ebird.org/v2/ref/taxonomy/ebird?species=';
-          let promises = [];
-          let speciesData = {};
-    
-          fetch(ORUrl, {
-            headers: {
-              'X-eBirdApiToken': apiKey
-            }
-          })
-          .then(response => {
-            if (!response.ok) {
-              throw new Error('Network response was not ok');
-            }
-            return response.json();
-          })
-          .then(data => {
-            // Iterate over each species code and initialize its data structure
-            data.forEach(species => {
-              const taxonomyUrl = taxonomyBaseUrl + species + '&fmt=json';
-              const promise = fetch(taxonomyUrl, {
-                headers: {
-                  'X-eBirdApiToken': apiKey
-                }
-              })
-              .then(response => {
-                if (!response.ok) {
-                  throw new Error('Network response was not ok');
-                }
-                return response.json();
-              })
-              .then(taxonomyData => {
-                // Append species data to speciesData object using species code as key
-                speciesData[species] = {
-                  speciesCode: taxonomyData[0].speciesCode,
-                  comName: taxonomyData[0].comName
-                };
-              })
-              .catch(error => {
-                console.error('Error fetching taxonomy data:', error);
-              });
-              
-              promises.push(promise); // Push each promise to the promises array
-            });
-            
-            // Wait for all promises to resolve
-            return Promise.all(promises);
-          })
-          .then(() => {
-            // Convert speciesData object to an array of objects
-            const speciesArray = Object.keys(speciesData).map(key => ({
-              speciesCode: key,
-              comName: speciesData[key].comName
-            }));
-    
-            // Sort speciesArray alphabetically by common name (comName)
-            speciesArray.sort((a, b) => {
-              const nameA = a.comName.toUpperCase();
-              const nameB = b.comName.toUpperCase();
-    
-              if (nameA < nameB) {
-                return -1;
-              }
-              if (nameA > nameB) {
-                return 1;
-              }
-              return 0;
-            });
-    
-            this.speciesArray = speciesArray
-            this.searchPlaceholder = 'Search a bird'
-            this.isFetching = false
-          })
-          .catch(error => {
-            console.error('Error fetching OR data:', error);
-          });
-        }, */
         selectDropdown(item) {
           this.birdNames = [];
           this.sliderValue= 30;
@@ -361,45 +282,12 @@
                 this.selectionCircle = null;
             }
 
-          const apiKey = "g0gbj09j2s1b";
+
           // Define the API URL, inserting the selected species code dynamically
-          const apiUrl = `https://api.ebird.org/v2/data/obs/US-OR/recent/${this.selectedSpeciesCode}?back=30&r=US-ID,US-CA,US-NV,US-WA,US-OR`;
+          this.apiURL = `https://api.ebird.org/v2/data/obs/US-OR/recent/${this.selectedSpeciesCode}?back=30&r=US-ID,US-CA,US-NV,US-WA,US-OR`;
+          this.updateMapMarkers();
 
-          // Fetch data from the API
-          fetch(apiUrl, {
-            headers: {
-              'X-eBirdApiToken': apiKey
-            }
-          })
-          .then(response => {
-            if (!response.ok) {
-              throw new Error('Network response was not ok');
-            }
-            return response.json();
-          })
-          .then(data => {
-            // Assuming data is an array of observations
-            this.allObservations = data; // Store fetched observations
-
-            // Initial display of markers based on the current slider value
-            this.updateMapMarkers();
-            
-            if (this.markerGroup.getLayers().length > 0) {
-              this.map.fitBounds(this.markerGroup.getBounds(), { padding: [10, 10] });
-            } else {
-              this.showNoDataMessage = true
-              setTimeout(() => {
-                this.showNoDataMessage = false;
-              }, 1500);
-            }
-            this.coverScreen = false;
-          })
-          .catch(error => {
-            console.error('Error fetching data:', error);
-            this.coverScreen = false;
-          });
         },
-
         hideOptions() {
           // Delay hiding options to allow clicking on options
           setTimeout(() => {
@@ -499,56 +387,138 @@
           this.isSliderVisible = true;
           this.coverScreen = true; // Show loading indication
           this.markerGroup.clearLayers(); // Clear existing layers from the map
-
           const currentDate = new Date();
-          // Filter observations based on the slider's value
-          const filteredObservations = this.allObservations.filter(observation => {
-          const obsDate = new Date(observation.obsDt);
-          const timeDiff = currentDate - obsDate;
-          const daysAgo = timeDiff / (1000 * 3600 * 24);
-
-          // The condition now ensures that as you move the slider to the left (decreasing the value),
-          // you start filtering out the newer observations
-          return daysAgo >= (30 - this.sliderValue);
-        });
-
-          filteredObservations.sort((a, b) => {
-            const dateA = new Date(a.obsDt);
-            const dateB = new Date(b.obsDt);
-            return dateA - dateB; // Compare dates to sort
-          });
-
-          // Add circles for filtered observations
-          filteredObservations.forEach(observation => {
-            const obsDate = new Date(observation.obsDt);
-            const currentDate = new Date();
-            const timeDiff = currentDate - obsDate;
-            const daysAgo = timeDiff / (1000 * 3600 * 24);
-            let color;
-            // Assign color based on how recent the observation was
-            if (daysAgo <= 7.5) {
-              color = 'green';
-            } else if (daysAgo <= 15) {
-              color = 'limegreen';
-            } else if (daysAgo <= 22.5) {
-              color = 'orange';
-            } else {
-              color = 'red';
+          // Fetch data from the API
+          fetch(this.apiURL, {
+            headers: {
+              'X-eBirdApiToken': this.apiKey
             }
+          })
+          .then(response => {
+            if (!response.ok) {
+              throw new Error('Network response was not ok');
+            }
+            return response.json();
+          })
+          .then(data => {
+            // Assuming data is an array of observations
+            this.allObservations = data; // Store fetched observations
+            
+            if (this.markerGroup.getLayers().length > 0) {
+              this.map.fitBounds(this.markerGroup.getBounds(), { padding: [10, 10] });
+            } else {
+              this.selectFaraway()
+              
+            }
+            // Filter observations based on the slider's value
+            const filteredObservations = this.allObservations.filter(observation => {
+              const obsDate = new Date(observation.obsDt);
+              const timeDiff = currentDate - obsDate;
+              const daysAgo = timeDiff / (1000 * 3600 * 24);
 
-            const popupContent = `Species: ${observation.comName}<br>Date: ${observation.obsDt}<br>Location: ${observation.locName}`;
-            const circle = new L.CircleMarker([observation.lat, observation.lng], {
-              color: color,
-              opacity: 0,
-              fillColor: color,
-              fillOpacity: 0.2,
-              radius: 3
-            }).bindPopup(popupContent);
+              // The condition now ensures that as you move the slider to the left (decreasing the value),
+              // you start filtering out the newer observations
+              return daysAgo >= (30 - this.sliderValue);
+            });
 
-            this.markerGroup.addLayer(circle);
+            filteredObservations.sort((a, b) => {
+              const dateA = new Date(a.obsDt);
+              const dateB = new Date(b.obsDt);
+              return dateA - dateB; // Compare dates to sort
+            });
+
+            // Add circles for filtered observations
+            filteredObservations.forEach(observation => {
+              const obsDate = new Date(observation.obsDt);
+              const currentDate = new Date();
+              const timeDiff = currentDate - obsDate;
+              const daysAgo = timeDiff / (1000 * 3600 * 24);
+              let color;
+              // Assign color based on how recent the observation was
+              if (daysAgo <= 7.5) {
+                color = 'green';
+              } else if (daysAgo <= 15) {
+                color = 'limegreen';
+              } else if (daysAgo <= 22.5) {
+                color = 'orange';
+              } else {
+                color = 'red';
+              }
+
+              const popupContent = `Species: ${observation.comName}<br>Date: ${observation.obsDt}<br>Location: ${observation.locName}`;
+              const circle = new L.CircleMarker([observation.lat, observation.lng], {
+                color: color,
+                opacity: 0,
+                fillColor: color,
+                fillOpacity: 0.2,
+                radius: 3
+              }).bindPopup(popupContent);
+
+              this.markerGroup.addLayer(circle);
+            });
+            this.coverScreen = false;
+          })
+          .catch(error => {
+            console.error('Error fetching data:', error);
+            this.coverScreen = false;
           });
+        },
+        updateMapMarkersSlider() {
+          this.isSliderVisible = true;
+          this.markerGroup.clearLayers(); // Clear existing layers from the map
+          const currentDate = new Date();
+                      // Filter observations based on the slider's value
+                      const filteredObservations = this.allObservations.filter(observation => {
+              const obsDate = new Date(observation.obsDt);
+              const timeDiff = currentDate - obsDate;
+              const daysAgo = timeDiff / (1000 * 3600 * 24);
 
-          this.coverScreen = false; // Hide loading indication
+              // The condition now ensures that as you move the slider to the left (decreasing the value),
+              // you start filtering out the newer observations
+              return daysAgo >= (30 - this.sliderValue);
+            });
+
+            filteredObservations.sort((a, b) => {
+              const dateA = new Date(a.obsDt);
+              const dateB = new Date(b.obsDt);
+              return dateA - dateB; // Compare dates to sort
+            });
+
+            // Add circles for filtered observations
+            filteredObservations.forEach(observation => {
+              const obsDate = new Date(observation.obsDt);
+              const currentDate = new Date();
+              const timeDiff = currentDate - obsDate;
+              const daysAgo = timeDiff / (1000 * 3600 * 24);
+              let color;
+              // Assign color based on how recent the observation was
+              if (daysAgo <= 7.5) {
+                color = 'green';
+              } else if (daysAgo <= 15) {
+                color = 'limegreen';
+              } else if (daysAgo <= 22.5) {
+                color = 'orange';
+              } else {
+                color = 'red';
+              }
+
+              const popupContent = `Species: ${observation.comName}<br>Date: ${observation.obsDt}<br>Location: ${observation.locName}`;
+              const circle = new L.CircleMarker([observation.lat, observation.lng], {
+                color: color,
+                opacity: 0,
+                fillColor: color,
+                fillOpacity: 0.2,
+                radius: 3
+              }).bindPopup(popupContent);
+
+              this.markerGroup.addLayer(circle);
+            });
+
+        },
+        selectFaraway() {
+          // Define the API URL, inserting the selected species code dynamically
+          this.apiURL = `https://api.ebird.org/v2/data/nearest/geo/recent/${this.selectedSpeciesCode}?lat=44.3&lng=-121.2&back=30`;
+          this.updateMapMarkers();
         },
         updateMapMarkersLocal() {
             this.isSliderVisible = false;
