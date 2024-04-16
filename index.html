@@ -230,6 +230,8 @@
             showOptions: false,
             birdNames: [],
             migratorNames: [],
+            migratorNamesMemory: [],
+            topMigratorCalled: false,
             coverScreen: false,
             coverScreenMigrators: false,
             coverScreenLat: false,
@@ -280,6 +282,7 @@
       methods: {
         selectDropdown(item) {
           this.birdNames = [];
+          this.migratorNames = [];
           this.sliderValue= 30;
           this.coverScreen = true;
           this.markerGroup.clearLayers();
@@ -390,9 +393,9 @@
           this.map.setView([40.8, -119.5], 5);
           this.isSliderVisible = false;
           if (this.selectionCircle) {
-                this.map.removeLayer(this.selectionCircle);
-                this.selectionCircle = null;
-            }
+              this.map.removeLayer(this.selectionCircle);
+              this.selectionCircle = null;
+          }
           // Any other state resets related to clearing the search
         },
         updateMapMarkers() {
@@ -537,6 +540,7 @@
           this.updateMapMarkers();
         },
         updateMapMarkersLocal() {
+            this.migratorNames = [];
             this.isSliderVisible = false;
             this.coverScreen = true; // Show loading overlay
             this.uniqueBirds = new Map();
@@ -593,6 +597,7 @@
             });
         },
         updateMapMarkersHotspot() {
+            this.migratorNames = [];
             this.isSliderVisible = false;
             this.coverScreen = true; // Show loading overlay
             this.markerGroup.clearLayers(); // Clear existing markers
@@ -659,61 +664,76 @@
             });
         },
         topMigrators() {
-          this.fetchProgress = 0;  // Reset progress on function start
-          this.totalSpecies = this.speciesArray.length;  // Set total number of species
-          const migrationLatObj = {};
-          const currentDate = new Date();
-          const fetchPromises = this.speciesArray.map(species => {
-              this.coverScreenMigrators = true;
-              this.apiURL = `https://api.ebird.org/v2/data/obs/US-OR/recent/${species.speciesCode}?back=30&r=US-ID,US-CA,US-NV,US-WA,US-OR`;
-              return fetch(this.apiURL, {
-                  headers: {
-                      'X-eBirdApiToken': this.apiKey
-                  }
-              })
-              .then(response => {
-                  if (!response.ok) {
-                      throw new Error('Network response was not ok');
-                  }
-                  return response.json();
-              })
-              .then(data => {
-                  this.fetchProgress++;
-                  if (data.length > 100 && data.length < 3000) {
-                      const oldData = new Set();
-                      const newData = new Set();
-                      data.forEach(observation => {
-                          const obsDate = new Date(observation.obsDt);
-                          const timeDiff = currentDate - obsDate;
-                          const daysAgo = timeDiff / (1000 * 3600 * 24);
-                          if (daysAgo > 20) {
-                              oldData.add(observation.lat);
-                          } else {
-                              newData.add(observation.lat);
-                          }
-                      });
-                      if (oldData.size && newData.size) {
-                          const maxOldLat = Math.max(...oldData);
-                          const maxNewLat = Math.max(...newData);
-                          const latDiff = maxNewLat - maxOldLat;
-                          migrationLatObj[species.speciesCode] = {
-                            comName: species.comName,
-                            latDiff: latDiff,
-                            speciesCode: species.speciesCode  // Include speciesCode here
-                        };
-                      }
-                  }
-              })
-              .catch(error => {
-                  console.error('Error fetching data:', error);
-              });
-          });
+          if (this.migratorNamesMemory.length < 1) {
+            this.fetchProgress = 0;  // Reset progress on function start
+            this.totalSpecies = this.speciesArray.length;  // Set total number of species
+            const migrationLatObj = {};
+            const currentDate = new Date();
+            const fetchPromises = this.speciesArray.map(species => {
+                this.coverScreenMigrators = true;
+                this.apiURL = `https://api.ebird.org/v2/data/obs/US-OR/recent/${species.speciesCode}?back=30&r=US-ID,US-CA,US-NV,US-WA,US-OR`;
+                return fetch(this.apiURL, {
+                    headers: {
+                        'X-eBirdApiToken': this.apiKey
+                    }
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    this.fetchProgress++;
+                    if (data.length > 100 && data.length < 3000) {
+                        const oldData = new Set();
+                        const newData = new Set();
+                        data.forEach(observation => {
+                            const obsDate = new Date(observation.obsDt);
+                            const timeDiff = currentDate - obsDate;
+                            const daysAgo = timeDiff / (1000 * 3600 * 24);
+                            if (daysAgo > 20) {
+                                oldData.add(observation.lat);
+                            } else {
+                                newData.add(observation.lat);
+                            }
+                        });
+                        if (oldData.size && newData.size) {
+                            const maxOldLat = Math.max(...oldData);
+                            const maxNewLat = Math.max(...newData);
+                            const latDiff = maxNewLat - maxOldLat;
+                            migrationLatObj[species.speciesCode] = {
+                              comName: species.comName,
+                              latDiff: latDiff,
+                              speciesCode: species.speciesCode  // Include speciesCode here
+                          };
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching data:', error);
+                });
+            });
 
-          Promise.all(fetchPromises).then(() => {
-              const sortedSpecies = Object.values(migrationLatObj).sort((a, b) => b.latDiff - a.latDiff).slice(0, 10);
-              this.migratorNames = sortedSpecies;
-              this.coverScreenMigrators = false;
-          });
+            Promise.all(fetchPromises).then(() => {
+                this.migratorNames = Object.values(migrationLatObj).sort((a, b) => b.latDiff - a.latDiff).slice(0, 10);
+                this.migratorNamesMemory = this.migratorNames
+                this.topMigratorCalled = true;
+                this.coverScreenMigrators = false;
+            });
+          } else {
+            this.migratorNames = this.migratorNamesMemory
+            this.birdNames = [];
+            this.sliderValue = 30;
+            this.searchQuery = ''; // Clear the search query
+            this.markerGroup.clearLayers();
+            this.map.setView([40.8, -119.5], 5);
+            this.isSliderVisible = false;
+            if (this.selectionCircle) {
+                this.map.removeLayer(this.selectionCircle);
+                this.selectionCircle = null;
+            }
+          }
         },
         topMigratorsListClick(item) {
           const miles = Math.round(item.latDiff*69)
