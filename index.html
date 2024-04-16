@@ -455,7 +455,7 @@
                 color = 'red';
               }
 
-              const popupContent = `Species: ${observation.comName}<br>Date: ${observation.obsDt}<br>Location: ${observation.locName}`;
+              const popupContent = `Species: ${observation.comName}<br>Date: ${observation.obsDt}<br>Location: ${observation.locName}</br>Bird Info: <a target='_blank' href='https://ebird.org/species/${observation.speciesCode}'>More Info</a>`;
               const circle = new L.CircleMarker([observation.lat, observation.lng], {
                 color: color,
                 opacity: 0,
@@ -665,6 +665,7 @@
         },
         topMigrators() {
           if (this.migratorNamesMemory.length < 1) {
+            //const speciesTest = [{"speciesCode": "comloo","comName": "Common Loon"},{"speciesCode": "commer","comName": "Common Merganser"},{"speciesCode": "commur","comName": "Common Murre"},{"speciesCode": "comnig","comName": "Common Nighthawk"},{"speciesCode": "compoo","comName": "Common Poorwill"},{"speciesCode": "comrav","comName": "Common Raven"},{"speciesCode": "comred","comName": "Common Redpoll"},{"speciesCode": "blksco1","comName": "Common Scoter"}];
             this.fetchProgress = 0;  // Reset progress on function start
             this.totalSpecies = this.speciesArray.length;  // Set total number of species
             const migrationLatObj = {};
@@ -708,6 +709,48 @@
                               speciesCode: species.speciesCode  // Include speciesCode here
                           };
                         }
+                    } else {
+                        this.apiURL = `https://api.ebird.org/v2/data/nearest/geo/recent/${species.speciesCode}?lat=44.3&lng=-121.2&back=30`;
+                        return fetch(this.apiURL, {
+                            headers: {
+                                'X-eBirdApiToken': this.apiKey
+                            }
+                        })
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error('Network response was not ok');
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
+                            if (data.length > 100 && data.length < 3000) {
+                                const oldData = new Set();
+                                const newData = new Set();
+                                data.forEach(observation => {
+                                    const obsDate = new Date(observation.obsDt);
+                                    const timeDiff = currentDate - obsDate;
+                                    const daysAgo = timeDiff / (1000 * 3600 * 24);
+                                    if (daysAgo > 20) {
+                                        oldData.add(observation.lat);
+                                    } else {
+                                        newData.add(observation.lat);
+                                    }
+                                });
+                                if (oldData.size && newData.size) {
+                                    const maxOldLat = Math.max(...oldData);
+                                    const maxNewLat = Math.max(...newData);
+                                    const latDiff = maxNewLat - maxOldLat;
+                                    migrationLatObj[species.speciesCode] = {
+                                    comName: species.comName,
+                                    latDiff: latDiff,
+                                    speciesCode: species.speciesCode  // Include speciesCode here
+                                };
+                                }
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error fetching data:', error);
+                        }); 
                     }
                 })
                 .catch(error => {
