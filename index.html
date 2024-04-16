@@ -667,7 +667,7 @@
                   return response.json();
               })
               .then(data => {
-                  if (data.length > 100) {
+                  if (data.length > 100 && data.length < 3000) {
                       const oldData = new Set();
                       const newData = new Set();
                       data.forEach(observation => {
