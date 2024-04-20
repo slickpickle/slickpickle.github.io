@@ -377,7 +377,7 @@
             if (!this.handleMapClick) return;
             this.latitude = e.latlng.lat
             this.longitude = e.latlng.lng
-            this.apiURL = `https://api.ebird.org/v2/data/obs/geo/recent?lat=${this.latitude}&lng=${this.longitude}&back=30&dist=50`;
+            this.apiURL = `https://api.ebird.org/v2/data/obs/geo/recent?lat=${this.latitude}&lng=${this.longitude}&back=10&dist=50`;
             this.birdButtonClick = false;
             this.updateMapMarkersLocal()
             // Reset handleMapClick to false to prevent additional selections until the button is clicked again
