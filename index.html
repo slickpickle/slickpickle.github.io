@@ -314,7 +314,7 @@
                 navigator.geolocation.getCurrentPosition(position => {
                 this.latitude = position.coords.latitude;
                 this.longitude = position.coords.longitude;
-                this.apiURL = `https://api.ebird.org/v2/data/obs/geo/recent/notable?lat=${this.latitude}&lng=${this.longitude}&back=30&dist=50`;
+                this.apiURL = `https://api.ebird.org/v2/data/obs/geo/recent/notable?lat=${this.latitude}&lng=${this.longitude}&back=10&dist=50`;
                 this.updateMapMarkersLocal()
                 }, error => {
                     console.error('Error getting location:', error);
@@ -328,7 +328,7 @@
                 navigator.geolocation.getCurrentPosition(position => {
                 this.latitude = position.coords.latitude;
                 this.longitude = position.coords.longitude;
-                this.apiURL = `https://api.ebird.org/v2/data/obs/geo/recent?lat=${this.latitude}&lng=${this.longitude}&back=30&dist=50`;
+                this.apiURL = `https://api.ebird.org/v2/data/obs/geo/recent?lat=${this.latitude}&lng=${this.longitude}&back=10&dist=50`;
                 this.updateMapMarkersLocal()
                 }, error => {
                     console.error('Error getting location:', error);
@@ -352,7 +352,7 @@
             }
         },
         onBirdNameClick(bird) {
-          this.apiURL = `https://api.ebird.org/v2/data/nearest/geo/recent/${bird.speciesCode}?lat=${this.latitude}&lng=${this.longitude}&back=30&dist=50`
+          this.apiURL = `https://api.ebird.org/v2/data/nearest/geo/recent/${bird.speciesCode}?lat=${this.latitude}&lng=${this.longitude}&back=10&dist=50`
           this.birdButtonClick = true
           this.updateMapMarkersLocal()
         },
