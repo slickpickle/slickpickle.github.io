@@ -790,7 +790,7 @@
           this.allObservations = []; // Clear previous observations
           this.latMessage = `Miles travled: ${miles}`; // Set cover message to show latDiff
                     this.coverScreenLat = true;
-          this.apiURL = `https://api.ebird.org/v2/data/obs/US-OR/recent/${this.selectedSpeciesCode}?back=30&r=US-ID,US-CA,US-NV,US-WA,US-OR`;
+          this.apiURL = `https://api.ebird.org/v2/data/nearest/geo/recent/${this.selectedSpeciesCode}?lat=44.3&lng=-121.2&back=30`;
           this.updateMapMarkers();
         }
       }
