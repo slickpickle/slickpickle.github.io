@@ -52,10 +52,10 @@
         <input type="range" v-model="sliderValue" min="0" max="30" class="dateSlider" v-show="isSliderVisible">
         <div id="map" ref="mapContainer"></div>
     </div>
-    <div v-show="coverScreen" class="cover-screen">Fetching data...</div>
-    <div v-show="coverScreenLat" class="cover-screen">{{ latMessage }}</div>
-    <div v-show="coverScreenMigrators" class="cover-screen">Fetching data... ({{ fetchProgress }}/{{ totalSpecies }})<br>calculating the 10 species that traveled<br>the farthest north in the last 20 days</div>
-    <div v-show="showNoDataMessage" class="no-data-message">No recent sightings</div> 
+    <div v-if="coverScreen" class="cover-screen">Fetching data...</div>
+    <div v-if="coverScreenLat" class="cover-screen">{{ latMessage }}</div>
+    <div v-if="coverScreenMigrators" class="cover-screen">Fetching data... ({{ fetchProgress }}/{{ totalSpecies }})<br>calculating the 10 species that traveled<br>the farthest north in the last 20 days</div>
+    <div v-if="showNoDataMessage" class="no-data-message">No recent sightings</div> 
     </div>
   <style>
     html, body {
