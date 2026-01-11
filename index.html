@@ -298,12 +298,12 @@
           return this.speciesArray.filter(item =>
             item.comName.toLowerCase().includes(this.searchQuery.toLowerCase())
           );
-        }
-      },
+        },
       birdCount() {
           return this.birdNames.length;
         }
       },
+    
       mounted() {
         // Call the API when the component is mounted
         /* this.fetchData(); */
